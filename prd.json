@@ -1,0 +1,1403 @@
+{
+  "document": {
+    "title": "Lecture Studio — Interactive Prototype PRD",
+    "version": "0.2.0",
+    "status": "approved_direction_for_prototype_not_final_product",
+    "date": "2026-11-27",
+    "language": "English",
+    "product_name": "Lecture Studio (working title)",
+    "scope": "Clickable frontend prototype only; future functional V1 requirements are captured separately.",
+    "repository": "New independent Lecture Studio prototype repository (URL to be supplied by developer)",
+    "baseline_branch": "feat/finalize-for-remote",
+    "suggested_branch": "feat/interactive-prototype",
+    "suggested_directory": "Repository root; app source in src/",
+    "source_of_truth": [
+      {
+        "path": "diagrams/lecture_to_video_v4.mmd",
+        "url": "https://github.com/YoussefElkondakly/ashraf-elbasel-n8n/blob/feat/finalize-for-remote/diagrams/lecture_to_video_v4.mmd",
+        "meaning": "Existing workflow structure and H1–H6 gates, not an assertion that API automation is implemented."
+      },
+      {
+        "path": "docs/APPROVAL_GATES.md",
+        "url": "https://github.com/YoussefElkondakly/ashraf-elbasel-n8n/blob/feat/finalize-for-remote/docs/APPROVAL_GATES.md",
+        "meaning": "Existing approval, revision, fingerprint and rejection rules."
+      },
+      {
+        "path": "Current product discovery conversation",
+        "meaning": "New dashboard, reusable prompts, notifications, API-first V1, clinic-time productivity; these are proposed requirements, not existing features."
+      },
+      {
+        "path": "2026-11-27 design decisions",
+        "meaning": "Dashboard A, navy/teal, light first, laptop primary, stage-specific direct edit and regeneration, immediate notification per approval, prompt categories, $10–20 monthly API target, new repository, AI-first design, local phased commits."
+      }
+    ],
+    "baseline_repository": "https://github.com/YoussefElkondakly/ashraf-elbasel-n8n"
+  },
+  "vision": {
+    "problem": "A clinician loses active work time manually noticing AI completion, downloading artifacts, transferring them to the next provider and copying prompts. Time between clinic patients should be spent on professional review rather than clerical AI handoffs.",
+    "solution": "A personal lecture production workspace that automatically moves data between AI stages and pauses only at genuine human decision points.",
+    "principle": "Human-in-the-loop, not human-in-the-middle.",
+    "primary_user": {
+      "role": "Medical professor / lecture author",
+      "name": "Dr. Ashraf Elbasel",
+      "context": "Experienced, technology-positive clinician and educator, often interrupted by patients. No assumption of poor technical ability.",
+      "devices": [
+        "Laptop/desktop primary (confirmed by developer)",
+        "Responsive mobile support; actual mobile review use to validate with doctor"
+      ]
+    },
+    "secondary_user": {
+      "role": "Developer/administrator",
+      "responsibilities": [
+        "Setup and support",
+        "Provider credentials and cost policy",
+        "Deployment and diagnostics"
+      ]
+    },
+    "success_metrics": [
+      {
+        "id": "KPI-01",
+        "name": "Active doctor minutes per lecture",
+        "target": "Minimize; measure current baseline and prototype review tasks before setting numeric target."
+      },
+      {
+        "id": "KPI-02",
+        "name": "Manual inter-provider transfers",
+        "target": 0,
+        "scope": "Future functional V1 standard path; prototype simulates automatic transfers."
+      },
+      {
+        "id": "KPI-03",
+        "name": "Time to start a lecture",
+        "target": "Proposed: under 60 seconds once defaults and prompts are configured; validate with the doctor."
+      },
+      {
+        "id": "KPI-04",
+        "name": "Lectures completed per clinic day",
+        "target": "Explore 10 per 10-hour day as an aspiration, not a promise; validate duration, review capacity, provider quota and quality."
+      },
+      {
+        "id": "KPI-05",
+        "name": "Time to reach an actionable review after opening a notification",
+        "target": "Proposed: one direct link and no more than one confirmation after authentication."
+      },
+      {
+        "id": "KPI-06",
+        "name": "Cost per completed lecture and monthly spend",
+        "target": "Future V1 API spending target USD $10–20/month; hard cap, warning threshold, provider allocation and achievable lecture count remain open. No live charges in prototype."
+      }
+    ]
+  },
+  "scope": {
+    "prototype_must_have": [
+      "Responsive interactive web application using JavaScript, HTML and CSS (React recommended).",
+      "Home dashboard; lecture creation; project list/detail; complete H1–H6 review journey; master prompt CRUD; Skills management mock; notifications; provider/model settings mock; realistic error and recovery states.",
+      "Synthetic data and deterministic simulated asynchronous jobs with accelerated demo time; durable demo state across refresh; independent lectures progress concurrently.",
+      "No manual AI-to-AI download/upload/copy step in the target path; user sees processing and can leave the page.",
+      "All important buttons have working simulated behavior; no fake enabled integrations.",
+      "Laptop-first desktop and responsive mobile review flows, keyboard navigation and accessible controls.",
+      "Interview-ready prototype with seeded projects and reset-demo control."
+    ],
+    "future_functional_v1": [
+      "Official Google Gemini API for text and TTS, official Anthropic API for Claude tasks subject to capabilities and user-authorized spend.",
+      "Real secure credential storage, model capability discovery or curated supported model lists, connection test and budget enforcement.",
+      "Durable queued/background jobs, retry and idempotency, project isolation, authenticated review, notification delivery, artifact storage, cost accounting.",
+      "Preserve existing Python state, validation and rendering behavior where beneficial; architecture decision after prototype validation.",
+      "Local or remote deployment to be decided; UI should not depend on either."
+    ],
+    "out_of_scope_now": [
+      "Implementing actual AI API calls, storing real API keys, sending real notifications, real patient data, live billing, hosting or server provisioning, Docker/n8n changes, OAuth implementation, native .exe packaging, real FFmpeg rendering, migration or deletion of current workflow.",
+      "Multi-tenant SaaS, public video publishing, custom workflow builder, general AI chat app, additional AI providers, teams/permissions management beyond single doctor and administrator."
+    ]
+  },
+  "design_system": {
+    "direction": "Selected: clinical clarity, light-first, premium medical education workspace; not an EHR or generic AI admin dashboard.",
+    "theme_options": [
+      {
+        "id": "A",
+        "name": "Clinical clarity",
+        "recommended": true,
+        "colors": {
+          "background": "#F5F7FA",
+          "surface": "#FFFFFF",
+          "text": "#142B45",
+          "muted_text": "#52647A",
+          "primary": "#153C63",
+          "accent": "#087F76",
+          "border": "#D8E1EA"
+        }
+      },
+      {
+        "id": "B",
+        "name": "Academic warmth",
+        "recommended": false,
+        "colors": {
+          "background": "#F7F4EE",
+          "surface": "#FFFEFC",
+          "text": "#28372F",
+          "muted_text": "#53645B",
+          "primary": "#235C4B",
+          "accent": "#96601B",
+          "border": "#DEDCD4"
+        }
+      },
+      {
+        "id": "C",
+        "name": "Modern studio",
+        "recommended": false,
+        "colors": {
+          "background": "#F6F7FC",
+          "surface": "#FFFFFF",
+          "text": "#1E293B",
+          "muted_text": "#526078",
+          "primary": "#3745A3",
+          "accent": "#087F76",
+          "border": "#DFE3F0"
+        }
+      }
+    ],
+    "status_tokens": {
+      "review": {
+        "text": "Needs review",
+        "color": "#92400E",
+        "background": "#FFF3D6"
+      },
+      "processing": {
+        "text": "Processing",
+        "color": "#174E87",
+        "background": "#E7F1FF"
+      },
+      "completed": {
+        "text": "Completed",
+        "color": "#166534",
+        "background": "#E8F5EC"
+      },
+      "blocked": {
+        "text": "Action needed",
+        "color": "#991B1B",
+        "background": "#FEECEC"
+      },
+      "draft": {
+        "text": "Draft",
+        "color": "#475569",
+        "background": "#EEF2F6"
+      }
+    },
+    "typography": {
+      "suggested_fonts": [
+        "Inter",
+        "Source Sans 3",
+        "system sans-serif fallback"
+      ],
+      "body_px": "17–18 default",
+      "headings": "Clear hierarchy, readable at a glance",
+      "controls": "Text labels plus icons; no icon-only critical actions"
+    },
+    "accessibility": {
+      "standard_target": "WCAG 2.2 AA; not a compliance claim until audited.",
+      "requirements": [
+        "Text contrast >= 4.5:1 for normal text; 3:1 for large text and relevant UI boundaries. Verify all theme pairs.",
+        "Prefer touch targets at least 44 x 44 CSS px, visible focus and keyboard access.",
+        "No color-only status indicators, no time-limited approvals, reduced-motion support.",
+        "Support 200% zoom and responsive reflow at 320 CSS px, with document/media previews handled gracefully.",
+        "English UI initially; Arabic localization is an open decision. Egyptian Arabic lecture content must display RTL in an isolated direction-aware content region. Avoid mixing English and Arabic within a single LTR label.",
+        "Show actual stage names and status instead of invented percentages; stage-count progress optional and labeled."
+      ]
+    },
+    "layout": {
+      "desktop": "Laptop-first review-oriented dashboard, left navigation, header, pending reviews above active processing. Primary visual evaluation at 1280x800 and 1440x900.",
+      "mobile": "Compact header, review-first cards, sticky action bar only when helpful; no horizontally scrolling primary forms.",
+      "home_variants_to_try": [
+        "A: Review-first productivity dashboard (selected); vary details without replacing layout."
+      ]
+    },
+    "design_resources": [
+      {
+        "name": "shadcn/ui React components",
+        "url": "https://ui.shadcn.com/",
+        "note": "Use selectively, not as a dense admin template."
+      },
+      {
+        "name": "WCAG 2.2",
+        "url": "https://www.w3.org/TR/WCAG22/",
+        "note": "Accessibility reference."
+      },
+      {
+        "name": "AI-driven frontend design",
+        "note": "No Figma deliverables; implement visual exploration in runnable browser UI and validate using screenshots."
+      }
+    ],
+    "selected_theme": "A",
+    "theme_mode": "light_only_initial",
+    "review_editing": {
+      "H1": "Edit canonical draft text (simulated) or request AI revision; regenerate paired PDF preview; require review of revised version. Never edit PDF independently as canonical text.",
+      "H2": "Change selected Skill/prompt before confirmation.",
+      "H3": "Edit storyboard text/scene notes or request targeted regeneration.",
+      "H4": "Edit selected transcript chunks or request targeted regeneration.",
+      "H5": "Listen and request regeneration for selected chunks; edit transcript via H4, not raw audio waveform.",
+      "H6": "Watch sample and request targeted correction via existing routes; render settings may be adjusted. No raw video editor."
+    }
+  },
+  "navigation": [
+    {
+      "id": "home",
+      "label": "Home",
+      "route": "/"
+    },
+    {
+      "id": "lectures",
+      "label": "My lectures",
+      "route": "/lectures"
+    },
+    {
+      "id": "reviews",
+      "label": "Pending reviews",
+      "route": "/reviews"
+    },
+    {
+      "id": "prompts",
+      "label": "Master prompts",
+      "route": "/prompts"
+    },
+    {
+      "id": "skills",
+      "label": "Claude Skills",
+      "route": "/skills"
+    },
+    {
+      "id": "settings",
+      "label": "Settings",
+      "route": "/settings"
+    },
+    {
+      "id": "notifications",
+      "label": "Notifications",
+      "route": "/notifications",
+      "placement": "header bell + mobile navigation"
+    }
+  ],
+  "screens": [
+    {
+      "id": "S01",
+      "name": "Home",
+      "priority": "must",
+      "requirements": [
+        "Welcome Dr. Ashraf with a calm greeting; no invented credentials or patient details.",
+        "Primary Start new lecture button. Secondary Review pending action with count.",
+        "Metrics: needs review, processing, completed (time filter visible if used), action needed. Counts derive from same seeded state.",
+        "Review inbox prioritized by when waiting began, with stage, lecture name, elapsed wait and Review action.",
+        "Active lecture cards/list with actual stage, state, last update and open action.",
+        "Optional recent completed items; no chart unless meaningful."
+      ],
+      "states": [
+        "empty",
+        "multiple active",
+        "review pending",
+        "all complete",
+        "provider blocked"
+      ]
+    },
+    {
+      "id": "S02",
+      "name": "Start new lecture",
+      "priority": "must",
+      "requirements": [
+        "Required: lecture name, synthetic lecture source (file metadata or seeded notes; no actual patient content), content-category master prompt selection. Filter by stage mapping.",
+        "Show selected content prompt title and version and preview its body.",
+        "Show a concise summary of audience, language, PDF style, duration, speaker count and voice preferences; Advanced settings lets doctor override prompt/default settings. Require confirmation of missing values.",
+        "Audience Doctors/Parents; language English/Egyptian Arabic; PDF style USMLE/Parent Education/Other; ONE/TWO/MULTI speakers; duration and voice direction. Preserve timing exception choices.",
+        "Start now creates unique project, snapshots prompt and settings, queues first simulated job, and shows success with link to dashboard.",
+        "Prevent accidental double submit; validate file/required fields."
+      ]
+    },
+    {
+      "id": "S03",
+      "name": "All lectures",
+      "priority": "must",
+      "requirements": [
+        "Search by name; status filter; sort by last updated/created.",
+        "Show stage and state with readable labels; open details; draft resume and confirmed archive.",
+        "Show meaningful empty and no-results states."
+      ]
+    },
+    {
+      "id": "S04",
+      "name": "Lecture detail / progress",
+      "priority": "must",
+      "requirements": [
+        "Six-gate timeline with current stage and artifact version.",
+        "Status, last updated, next action, notifications, approved/rejected history, source and output previews.",
+        "While processing: explain that doctor may leave; no manual transfer instructions.",
+        "While blocked: safe retry or change settings without losing successful outputs.",
+        "Show approximate costs only as clearly labeled mock estimates."
+      ]
+    },
+    {
+      "id": "S05",
+      "name": "Review inbox and review workspace",
+      "priority": "must",
+      "requirements": [
+        "Filter pending reviews by stage; open via direct project + gate deep link.",
+        "Preview source and draft together when feasible. Use stage-specific PDF/text/image/audio/video controls.",
+        "Show relevant master prompt, stage and artifact version.",
+        "Approve and continue, Request changes with required reason, Save feedback draft (proposed).",
+        "H1 approval confirmation; H2 actual selected skill identity or NONE; H4/H5 allow targeted chunk IDs; H5 explicit timing exception acknowledgment; H6 confirmation that full video was watched.",
+        "H6 revision route selectors: RENDER_ONLY, VISUALS, AUDIO, TRANSCRIPT, CONTENT.",
+        "Stale artifact version forces refresh; approval never bypasses human action.",
+        "After approve, queue next stage automatically and return to review inbox/dashboard. No copy/paste or external download/upload handoff.",
+        "Support a phone-friendly review layout; final full-video review may take actual video duration.",
+        "Provide direct editing where meaningful (H1 canonical text, H3 storyboard, H4 transcript), with explicit Save new revision and updated preview. No edit to approved artifact in place. Regenerate affected downstream files and re-review according to invalidation rules.",
+        "Offer optional next-stage prompt selector within relevant approvals, with stage-filtered choices, saved default or explicit selection; selection policy remains provisional."
+      ]
+    },
+    {
+      "id": "S06",
+      "name": "Master prompts",
+      "priority": "must",
+      "requirements": [
+        "Searchable prompt library grouped/filterable by category, title, intended stage mapping, version, updated date, preview and use count if useful.",
+        "Add prompt: title, category and prompt body required. Optional description and tags. Category dropdown includes Create category; category may map to one or more existing compatible stages.",
+        "Edit creates immutable new version. Duplicate, archive, restore; allow hard delete only for never-used prompt, with confirmation.",
+        "Existing lectures retain exact version; show history and read-only older versions.",
+        "Seed three clearly fictional prompt examples; never claim these are Dr. Ashraf’s real prompts.",
+        "Selecting prompt in intake and later review is allowed; offer sensible default or last used; do not force repetitive selections.",
+        "Category management: create, rename, archive/restore; prevent destructive delete while referenced; allow safe reassignment of active prompts without changing historical job snapshots.",
+        "Seed editable categories: Lecture content (A), Storyboard (B), Visual production (B2), Narration transcripts (C), Voice generation (D); optional custom categories with explicit stage mapping or unassigned. No user-created workflow engine/stages.",
+        "Use category-filtered prompt pickers at stage boundaries; unassigned categories are library-only until mapped. Retain category label and prompt version snapshot for each job."
+      ]
+    },
+    {
+      "id": "S07",
+      "name": "Claude Skills",
+      "priority": "must",
+      "requirements": [
+        "Separate from prompts. List title, description, origin (Claude Web reference / API-imported / simulated), provider Skill ID/version, last verification, status.",
+        "Add skill reference or mock import; edit label; archive; preview required dependencies if known.",
+        "Web-only reference must not imply API execution. Show Unverified / API ready (simulated) states.",
+        "H2 presents a selected Skill or NONE for human confirmation. Default can be saved for later projects but H2 remains required in current baseline.",
+        "Do not collect or expose real Skill contents in prototype; ask doctor for a list and sample permitted bundle later."
+      ]
+    },
+    {
+      "id": "S08",
+      "name": "Notifications",
+      "priority": "must",
+      "requirements": [
+        "Header unread count and inbox; filter All/Unread/Needs review/Issues; Mark read and Mark all read.",
+        "Each actionable notice opens exact lecture and review version, stale link routes to current stage.",
+        "Simulate review-ready email, in-app and push notification events; distinguish channel preferences from actual delivery.",
+        "Prevent duplicate review-ready events per project/gate/artifact version; mark action resolved after review.",
+        "Show mock delivery log/status; no real email, service worker push, browser notification permission or external network call required.",
+        "Immediate review-ready event for each distinct project/gate/artifact version. In-app inbox/toast plus simulated email/push events when channel is enabled; no batching by default."
+      ]
+    },
+    {
+      "id": "S09",
+      "name": "Settings",
+      "priority": "must",
+      "requirements": [
+        "Profile; default lecture preferences; Google and Anthropic connection cards; notification preferences; budget and usage mock.",
+        "Provider cards: masked fake credential, simulated connection test, supported model dropdown by task (Gemini content, Claude creative, Google TTS), disabled reason.",
+        "Require role/connection readiness in simulation; no real API keys, never persist or log credential text. Provide a Connect demo account action instead of asking for real secrets.",
+        "Models selected independently by capability. Display unknown costs as unknown, no automatic paid fallback.",
+        "Mock monthly budget target USD $10–20; proposed demo default $20 adjustable, not a confirmed hard cap. Explicitly simulated usage, warning and blocked states; never imply live charges.",
+        "Notification channels toggles and test simulation; explain actual email/push configuration later."
+      ]
+    },
+    {
+      "id": "S10",
+      "name": "Completed lecture / deliverables",
+      "priority": "must",
+      "requirements": [
+        "Final video player with synthetic sample/placeholder clearly labeled; PDF, canonical Markdown, storyboard, transcripts, voices, final MP4 and optional bundle.",
+        "Preview and download sample artifacts where available; show unavailable items explicitly, not fake files.",
+        "View approval log and versions; archive or duplicate as a new lecture without inheriting approvals."
+      ]
+    },
+    {
+      "id": "S11",
+      "name": "First-run / empty / error experiences",
+      "priority": "must",
+      "requirements": [
+        "First-run checklist with demo credentials and sample prompts; skip to explore.",
+        "Empty dashboard, no prompts, no skills, no reviews, offline/timeout/quota/budget/invalid credential/model unavailable states.",
+        "Retry and resume safely; no silent provider fallback.",
+        "Provide reset demo action with confirmation and synthetic fixture restoration."
+      ]
+    }
+  ],
+  "workflow": {
+    "baseline": "H1–H6 from existing Mermaid and approval-gate docs. New automatic jobs replace manual transfers; the actual API feasibility and H2 Skill execution are not proven.",
+    "states": [
+      "DRAFT",
+      "QUEUED",
+      "PROCESSING",
+      "NEEDS_REVIEW",
+      "REVISION_REQUESTED",
+      "BLOCKED",
+      "COMPLETED",
+      "ARCHIVED"
+    ],
+    "stages": [
+      {
+        "id": "A",
+        "name": "Generate lecture content",
+        "actor": "system / Gemini text API",
+        "inputs": [
+          "source",
+          "content prompt version",
+          "lecture preferences"
+        ],
+        "outputs": [
+          "lecture_master.md",
+          "doctor_review.pdf generated from same canonical content"
+        ],
+        "next": "H1"
+      },
+      {
+        "id": "H1",
+        "name": "Medical content review",
+        "actor": "doctor",
+        "review": [
+          "canonical Markdown",
+          "matching PDF",
+          "original source",
+          "medical facts, figures, numbers, doses, units, references"
+        ],
+        "approve": "H2",
+        "reject": "A",
+        "conditions": [
+          "qualified doctor confirmation",
+          "unchanged artifact fingerprint",
+          "rejected identical pair cannot pass"
+        ],
+        "next_prompt_selection": "Allow choosing/defaulting the next stage master prompt here without requiring another clerical handoff."
+      },
+      {
+        "id": "H2",
+        "name": "Confirm Claude Skills",
+        "actor": "doctor",
+        "review": [
+          "actual verified Skill references/versions or NONE",
+          "visual-stage master prompt choice"
+        ],
+        "approve": "B",
+        "reject": "H2",
+        "conditions": [
+          "Do not treat Claude Web Skill title as executable API Skill; warn if unverified or unsupported."
+        ]
+      },
+      {
+        "id": "B",
+        "name": "Generate storyboard and draft frames",
+        "actor": "system / Claude API and supported Skill or renderer",
+        "outputs": [
+          "storyboard.md",
+          "draft frames"
+        ],
+        "next": "H3"
+      },
+      {
+        "id": "H3",
+        "name": "Storyboard review",
+        "actor": "doctor",
+        "review": [
+          "storyboard and draft frames"
+        ],
+        "approve": "B2",
+        "reject": "B",
+        "conditions": [
+          "rejected version must change"
+        ]
+      },
+      {
+        "id": "B2",
+        "name": "Produce silent visuals",
+        "actor": "system / supported Claude Skill and local rendering",
+        "outputs": [
+          "ordered frames or silent_visuals.mp4",
+          "frames manifest"
+        ],
+        "next": "C"
+      },
+      {
+        "id": "C",
+        "name": "Generate narration transcripts",
+        "actor": "system / Claude API",
+        "outputs": [
+          "chunk_manifest.json",
+          "transcript_01.txt through N",
+          "pronunciation guide"
+        ],
+        "next": "H4",
+        "rules": [
+          "standard chunks 60–90 seconds; declared exceptions only; 600 s needs 7–10 chunks",
+          "ONE/TWO/MULTI means speakers; preserve voice consistency"
+        ]
+      },
+      {
+        "id": "H4",
+        "name": "Transcript review",
+        "actor": "doctor",
+        "review": [
+          "all transcripts",
+          "manifest",
+          "pronunciation guide"
+        ],
+        "approve": "D",
+        "reject": "C",
+        "conditions": [
+          "selected chunk IDs or ALL; unrelated chunks preserved"
+        ]
+      },
+      {
+        "id": "D",
+        "name": "Generate narration voices",
+        "actor": "system / Google TTS API",
+        "outputs": [
+          "per-chunk/turn audio",
+          "normalized files",
+          "measured durations"
+        ],
+        "next": "H5",
+        "rules": [
+          "per-turn audio for unsupported multi-speaker combinations if feasible",
+          "resume missing/rejected chunks without regenerating approved ones"
+        ]
+      },
+      {
+        "id": "H5",
+        "name": "Audio review",
+        "actor": "doctor",
+        "review": [
+          "all voice files",
+          "measured durations",
+          "language/accent and voice consistency"
+        ],
+        "approve": "E",
+        "reject": "D",
+        "conditions": [
+          "explicit confirmation for chunks outside 60–90 seconds",
+          "targeted rejected audio IDs only"
+        ]
+      },
+      {
+        "id": "E",
+        "name": "Render final video",
+        "actor": "system / Python + FFmpeg",
+        "outputs": [
+          "final_video.mp4",
+          "render verification report"
+        ],
+        "next": "H6"
+      },
+      {
+        "id": "H6",
+        "name": "Final video review",
+        "actor": "doctor",
+        "review": [
+          "full video with sound",
+          "verification report"
+        ],
+        "approve": "COMPLETED",
+        "reject_routes": {
+          "RENDER_ONLY": "E",
+          "VISUALS": "B2",
+          "AUDIO": "D",
+          "TRANSCRIPT": "C",
+          "CONTENT": "A"
+        },
+        "conditions": [
+          "confirm watched complete video",
+          "rejected identical render not accepted"
+        ]
+      }
+    ],
+    "invalidation": [
+      {
+        "change": "canonical content",
+        "reset": [
+          "H1",
+          "H2",
+          "H3",
+          "H4",
+          "H5",
+          "H6"
+        ],
+        "preserve": "files; audio remains reusable only if transcript unchanged"
+      },
+      {
+        "change": "doctor PDF only",
+        "reset": [
+          "H1"
+        ],
+        "preserve": "downstream approvals"
+      },
+      {
+        "change": "storyboard/draft frames",
+        "reset": [
+          "H3",
+          "H4"
+        ],
+        "preserve": "H5 for unchanged transcripts"
+      },
+      {
+        "change": "final frames/silent MP4",
+        "reset": [
+          "render",
+          "H6"
+        ],
+        "preserve": "H3–H5"
+      },
+      {
+        "change": "transcript chunk",
+        "reset": [
+          "H4",
+          "matching voice",
+          "H5",
+          "render",
+          "H6"
+        ],
+        "preserve": "other voices"
+      },
+      {
+        "change": "voice chunk",
+        "reset": [
+          "H5",
+          "render",
+          "H6"
+        ],
+        "preserve": "other voices and H1–H4"
+      },
+      {
+        "change": "render settings",
+        "reset": [
+          "H6"
+        ],
+        "preserve": "everything else"
+      }
+    ],
+    "rules": [
+      "Each project runs independently; at most one active job for same stage/artifact revision.",
+      "No AI approval; only explicit simulated human decisions in prototype.",
+      "Approval of an old artifact version fails safely.",
+      "After approval automatically enqueue next applicable system stage; H2 is human so route directly to H2 when needed.",
+      "After rejection save reason and affected IDs and simulate only appropriate regeneration.",
+      "Each gate creates a review-ready event and resolves it after action.",
+      "Use stage status instead of fake model progress percentages; mock processing may have a labeled simulated timer.",
+      "Prototype can accelerate completion, simulate failure, and advance jobs deterministically without real APIs.",
+      "Filter prompt choices by category-to-stage mapping; snapshot selected version at job enqueue. No forced extra human approval beyond six gates for routine transfers.",
+      "A direct edit creates a new artifact version; prior approvals cannot transfer silently; apply existing invalidation rules."
+    ]
+  },
+  "data_model": {
+    "storage_scope": "Conceptual domain model; prototype uses localStorage or IndexedDB for synthetic demo state only. No actual database or storage schema decisions in this phase. Future backend stores artifacts privately and secrets server-side.",
+    "entities": [
+      {
+        "name": "UserProfile",
+        "fields": [
+          "id",
+          "displayName",
+          "role",
+          "locale",
+          "defaultPreferences",
+          "notificationPreferences"
+        ],
+        "notes": "One doctor plus administrator in future; prototype persona switch for testing only."
+      },
+      {
+        "name": "LectureProject",
+        "fields": [
+          "id",
+          "title",
+          "sourceIds",
+          "preferencesSnapshot",
+          "currentStage",
+          "status",
+          "createdAt",
+          "updatedAt",
+          "archivedAt",
+          "promptVersionRefs",
+          "skillVersionRefs",
+          "providerModelSnapshot"
+        ],
+        "notes": "Do not persist a percentage independently; derive stage-count indicators."
+      },
+      {
+        "name": "SourceAsset",
+        "fields": [
+          "id",
+          "projectId",
+          "name",
+          "type",
+          "size",
+          "origin",
+          "storageRef",
+          "contentHash"
+        ],
+        "notes": "Private actual files in V1; synthetic metadata only in prototype."
+      },
+      {
+        "name": "PromptCategory",
+        "fields": [
+          "id",
+          "name",
+          "description",
+          "compatibleStageIds",
+          "createdAt",
+          "updatedAt",
+          "archivedAt"
+        ],
+        "notes": "Required for new prompts. Editable grouping and stage mapping; never creates new workflow stages. Safe archive/restore, block destructive deletion when referenced."
+      },
+      {
+        "name": "MasterPrompt",
+        "fields": [
+          "id",
+          "title",
+          "categoryId",
+          "description",
+          "tags",
+          "activeVersionId",
+          "createdAt",
+          "updatedAt",
+          "archivedAt"
+        ],
+        "notes": "Category is required; stage compatibility resolved via category mapping. Preserve immutable prompt and category snapshots in jobs/projects."
+      },
+      {
+        "name": "PromptVersion",
+        "fields": [
+          "id",
+          "promptId",
+          "version",
+          "body",
+          "createdAt",
+          "contentHash",
+          "categorySnapshot"
+        ],
+        "notes": "Immutable snapshot referenced by jobs and projects."
+      },
+      {
+        "name": "SkillReference",
+        "fields": [
+          "id",
+          "title",
+          "description",
+          "origin",
+          "provider",
+          "providerSkillId",
+          "providerSkillVersion",
+          "status",
+          "verifiedAt",
+          "archivedAt"
+        ],
+        "notes": "Web reference and executable API skill are distinct; do not store secrets."
+      },
+      {
+        "name": "ProviderConfiguration",
+        "fields": [
+          "provider",
+          "connectionStatus",
+          "credentialRef",
+          "maskedIdentifier",
+          "modelByTask",
+          "lastCheckedAt",
+          "capabilities"
+        ],
+        "notes": "credentialRef is opaque; no plaintext API key in browser, logs or Git. Prototype fake references only."
+      },
+      {
+        "name": "ArtifactVersion",
+        "fields": [
+          "id",
+          "projectId",
+          "kind",
+          "stage",
+          "version",
+          "storageRef",
+          "hash",
+          "mimeType",
+          "createdAt",
+          "producer",
+          "inputVersionRefs",
+          "chunkId",
+          "sceneId"
+        ],
+        "notes": "Version history and provenance."
+      },
+      {
+        "name": "ApprovalDecision",
+        "fields": [
+          "id",
+          "projectId",
+          "gate",
+          "artifactFingerprint",
+          "reviewerId",
+          "decision",
+          "note",
+          "affectedIds",
+          "route",
+          "createdAt"
+        ],
+        "notes": "Append-only and bound to authenticated reviewer in functional V1."
+      },
+      {
+        "name": "ProcessingJob",
+        "fields": [
+          "id",
+          "projectId",
+          "stage",
+          "status",
+          "attempt",
+          "idempotencyKey",
+          "inputVersions",
+          "provider",
+          "model",
+          "queuedAt",
+          "startedAt",
+          "finishedAt",
+          "errorCode",
+          "errorMessage"
+        ],
+        "notes": "Future persistent queue; prototype simulator only."
+      },
+      {
+        "name": "NotificationEvent",
+        "fields": [
+          "id",
+          "projectId",
+          "gate",
+          "artifactVersion",
+          "kind",
+          "message",
+          "deepLink",
+          "createdAt",
+          "readAt",
+          "resolvedAt",
+          "dedupKey",
+          "channelStatuses"
+        ]
+      },
+      {
+        "name": "UsageRecord",
+        "fields": [
+          "id",
+          "projectId",
+          "jobId",
+          "provider",
+          "model",
+          "tokenCounts",
+          "audioDuration",
+          "currency",
+          "estimatedCost",
+          "actualCost",
+          "timestamp"
+        ],
+        "notes": "Prototype mock; future actual usage and vendor price provenance."
+      },
+      {
+        "name": "BudgetPolicy",
+        "fields": [
+          "currency",
+          "period",
+          "limit",
+          "warningThreshold",
+          "enforcementMode"
+        ],
+        "notes": "Monthly USD $10–20 target confirmed; hard cap/enforcement unconfirmed. $20 is illustrative default only; no live enforcement in prototype."
+      }
+    ]
+  },
+  "user_stories": [
+    {
+      "id": "US01",
+      "priority": "must",
+      "story": "As a doctor, I want to start a lecture from a source and saved master prompt so I can return to patients quickly.",
+      "acceptance": [
+        "Three primary inputs, visible preferences summary, create unique project; successful start opens processing state."
+      ]
+    },
+    {
+      "id": "US02",
+      "priority": "must",
+      "story": "As a doctor, I want all AI-to-AI file and prompt transfers automated so I only review outputs.",
+      "acceptance": [
+        "All six gates reachable by simulated automatic jobs; no routine manual external handoff in standard path."
+      ]
+    },
+    {
+      "id": "US03",
+      "priority": "must",
+      "story": "As a doctor, I want to see what needs my attention immediately.",
+      "acceptance": [
+        "Dashboard count equals review inbox; review-ready notification opens exact gate."
+      ]
+    },
+    {
+      "id": "US04",
+      "priority": "must",
+      "story": "As a doctor, I want to approve or request targeted revisions on my laptop, with a usable phone fallback when needed.",
+      "acceptance": [
+        "Responsive review; rejection note required; choose affected IDs; no unintended reset."
+      ]
+    },
+    {
+      "id": "US05",
+      "priority": "must",
+      "story": "As a doctor, I want to manage several lectures at once.",
+      "acceptance": [
+        "Two seeded or newly created projects progress separately; a blocked project does not stop another."
+      ]
+    },
+    {
+      "id": "US06",
+      "priority": "must",
+      "story": "As a doctor, I want to reuse and edit my master prompts.",
+      "acceptance": [
+        "Create/edit/duplicate/archive/restore; previous project still points to old version."
+      ]
+    },
+    {
+      "id": "US07",
+      "priority": "must",
+      "story": "As a doctor, I want to select verified Claude Skills and prompts without reconfiguring every run.",
+      "acceptance": [
+        "Skill reference states; saved default; H2 explicit confirm; no claim that web Skills automatically transfer."
+      ]
+    },
+    {
+      "id": "US08",
+      "priority": "must",
+      "story": "As an administrator, I want to manage provider connections and model choices.",
+      "acceptance": [
+        "Demo connection, masked fake key, model options per task, failure and budget simulation; no real secrets."
+      ]
+    },
+    {
+      "id": "US09",
+      "priority": "must",
+      "story": "As a doctor, I want completed outputs in one place.",
+      "acceptance": [
+        "Final deliverables and approval history; functional demo previews or explicit mock/availability labels."
+      ]
+    },
+    {
+      "id": "US10",
+      "priority": "must",
+      "story": "As a doctor, I want processing state to survive interruptions.",
+      "acceptance": [
+        "Reload, reopen and navigate away without losing simulated progress or decisions; no duplicate jobs."
+      ]
+    },
+    {
+      "id": "US11",
+      "priority": "must",
+      "story": "As a doctor, I want to organize my master prompts into categories so I can quickly find the right prompt for each stage.",
+      "acceptance": [
+        "Create/rename/archive category, assign prompts, filter compatible prompts, retain historical snapshots and prevent destructive deletion of referenced records."
+      ]
+    },
+    {
+      "id": "US12",
+      "priority": "must",
+      "story": "As a doctor, I want to edit suitable outputs directly or request AI revisions so I can choose the quickest safe correction.",
+      "acceptance": [
+        "H1/H3/H4 text edits create revisions; other review stages use appropriate targeted correction actions; approvals bind to version."
+      ]
+    }
+  ],
+  "technical_direction": {
+    "prototype": {
+      "language": "JavaScript (JSX permitted); HTML/CSS",
+      "recommended_stack": [
+        "React + Vite (JavaScript/JSX)",
+        "CSS variables + selective Tailwind/shadcn components",
+        "React Router or equivalent",
+        "Lucide icons",
+        "Vitest for mock engine",
+        "Playwright + @axe-core/playwright for browser validation"
+      ],
+      "state": "Small deterministic mock workflow engine separated from components; a mock service adapter and versioned localStorage/IndexedDB synthetic fixtures. If timers are simulated, persist dueAt and reconcile on reload; label actual backend not running.",
+      "restrictions": [
+        "No backend required; no n8n or Docker runtime in prototype.",
+        "No API calls or real credentials; no external network dependence for demo after assets installed.",
+        "Use semantic HTML and proper focus/dialog handling.",
+        "Avoid unnecessary animation, excessive component dependencies, fake charts and decorative AI gradients.",
+        "New independent repository; no changes to original n8n repository or company repositories.",
+        "Use JavaScript/JSX, not TypeScript; set shadcn components.json tsx:false when applicable."
+      ]
+    },
+    "future_v1": {
+      "preferred_direction": "Evaluate existing FastAPI + reusable state machine + durable jobs behind same UI; final architecture is not locked.",
+      "integration_contract": [
+        "Provider adapters for Google text, Claude creative, Google TTS; explicit capability and pricing checks before enablement.",
+        "Claude custom Skills through supported API import/upload and versions; actual doctor bundles and required video tooling must be tested.",
+        "Use official authenticated APIs only; local operator automation a later alternative if cost is too high and permitted.",
+        "Server-side encrypted secrets or appropriate secret storage, authenticated/authorized approvals, private storage, durable queue, safe retry, usage ledger and notifications.",
+        "No secrets, source lectures, generated real content or approvals in public GitHub.",
+        "Review AI data handling policies and never use identifiable patient information in demo."
+      ]
+    },
+    "agent_skills": [
+      {
+        "name": "frontend-design",
+        "url": "https://github.com/anthropics/skills/tree/main/skills/frontend-design",
+        "purpose": "Visual hierarchy, distinct design direction and design tokens."
+      },
+      {
+        "name": "shadcn",
+        "url": "https://ui.shadcn.com/docs/skills",
+        "purpose": "Project-aware accessible component usage if shadcn/ui selected."
+      },
+      {
+        "name": "webapp-testing",
+        "url": "https://github.com/anthropics/skills/tree/main/skills/webapp-testing",
+        "purpose": "Browser interaction and screenshots."
+      },
+      {
+        "name": "Playwright accessibility testing (tooling, not a skill)",
+        "url": "https://playwright.dev/docs/accessibility-testing",
+        "purpose": "Run accessible interaction checks with axe plus manual keyboard and zoom checks."
+      }
+    ]
+  },
+  "demo_scenarios": [
+    {
+      "id": "D01",
+      "name": "Quick start",
+      "steps": [
+        "Open dashboard",
+        "Start new lecture",
+        "Choose demo source and content prompt",
+        "Start now",
+        "Return to dashboard",
+        "Simulated completion produces H1 review and notification"
+      ],
+      "expected": "No external AI website visited."
+    },
+    {
+      "id": "D02",
+      "name": "H1 rejection and re-review",
+      "steps": [
+        "Open review",
+        "Inspect original and draft PDF",
+        "Request changes with reason",
+        "Auto regeneration",
+        "Open new version",
+        "Approve and continue"
+      ],
+      "expected": "Rejected version cannot be approved; H2 is next."
+    },
+    {
+      "id": "D03",
+      "name": "Complete all six gates",
+      "steps": [
+        "Confirm H2 Skills",
+        "Wait for storyboard",
+        "Approve H3",
+        "Simulate final silent visuals then narration",
+        "Approve H4",
+        "Generate voices",
+        "Approve H5",
+        "Render",
+        "Watch sample and confirm H6"
+      ],
+      "expected": "Completed with approval history; no skipped gates."
+    },
+    {
+      "id": "D04",
+      "name": "Concurrent projects",
+      "steps": [
+        "Start two lectures",
+        "Open review for first",
+        "Return while second processes",
+        "Refresh"
+      ],
+      "expected": "Independent progress, no shared status or loss."
+    },
+    {
+      "id": "D05",
+      "name": "Prompt versioning",
+      "steps": [
+        "Start project with prompt v1",
+        "Edit prompt to v2",
+        "Inspect original project",
+        "Create new project"
+      ],
+      "expected": "Old project still v1; new selection uses v2."
+    },
+    {
+      "id": "D06",
+      "name": "Provider error and recovery",
+      "steps": [
+        "Simulate quota/budget stop",
+        "Open blocked project",
+        "Fix mock setting",
+        "Retry"
+      ],
+      "expected": "Explicit blocked state, no fallback or loss of finished artifacts."
+    },
+    {
+      "id": "D07",
+      "name": "Mobile notification",
+      "steps": [
+        "At 390 px open pending review from notification",
+        "Reject target chunk",
+        "Return to review inbox"
+      ],
+      "expected": "No horizontal scroll or inaccessible critical controls; target chunk only."
+    },
+    {
+      "id": "D08",
+      "name": "H6 targeted rejection",
+      "steps": [
+        "Reject final video via AUDIO + chunk ID",
+        "Re-review affected audio",
+        "Re-render",
+        "Approve H6"
+      ],
+      "expected": "Earlier unaffected gates remain approved; prior render preserved."
+    },
+    {
+      "id": "D09",
+      "name": "Prompt categories",
+      "steps": [
+        "Create category",
+        "Map to existing stage",
+        "Create prompt with category",
+        "Select at compatible stage",
+        "Archive category after use"
+      ],
+      "expected": "Category-filtered selection; historical snapshots remain valid; no new workflow stage."
+    },
+    {
+      "id": "D10",
+      "name": "Direct correction",
+      "steps": [
+        "Edit H1 canonical text",
+        "Save new revision",
+        "Review matching simulated PDF",
+        "Approve",
+        "Attempt stale approval"
+      ],
+      "expected": "New version requires review; stale decision rejected."
+    }
+  ],
+  "definition_of_done": [
+    "All listed must-have screens and primary interactions work with synthetic fixtures.",
+    "At least one full six-gate demo with real state transitions, rejection, automatic simulated resumption, version history and completion.",
+    "Two concurrent projects, refresh/reopen persistence, prompt CRUD/versioning, simulated settings and notifications tested.",
+    "Desktop screenshots at 1440x900 and 1280x800; mobile at 390px and 320px; test keyboard/focus, zoom, readable status and contrast.",
+    "Playwright tests cover D01–D10 or report exact untested gaps; no fake pass claims.",
+    "No real secret handling, live billing, external provider requests, patient material, production infrastructure or application migration.",
+    "README with one launch command (e.g. npm install then npm run dev), demo scenario, reset and explicit mock boundaries.",
+    "Record open questions and design choices separately; prototype is not product approval.",
+    "Category CRUD and stage-filtered prompt selection, direct edits and version invalidation tested.",
+    "Create local commits only after verified phases; no push, remote changes, AI coauthor trailers or unrelated repository edits."
+  ],
+  "stakeholder_questions": [
+    {
+      "id": "Q01",
+      "topic": "Home layout",
+      "question": "Which home feels better: A review-first dashboard or B calm minimal home?",
+      "default": "A",
+      "status": "answered_by_developer",
+      "answer": "A — Productivity dashboard"
+    },
+    {
+      "id": "Q02",
+      "topic": "Palette",
+      "question": "Clinical navy/teal, warm academic green, or modern indigo? Light-only or light + dark?",
+      "default": "A, light first",
+      "status": "answered_by_developer",
+      "answer": "Clinical navy/teal, light mode first"
+    },
+    {
+      "id": "Q03",
+      "topic": "Device and review depth",
+      "question": "Will the doctor start projects on laptop and approve on phone, or perform the whole workflow on phone? Which device and browser does he use?",
+      "default": "Desktop start, mobile approvals",
+      "status": "partially_answered",
+      "answer": "Laptop primary; mobile support retained; exact browser and actual mobile review use to validate"
+    },
+    {
+      "id": "Q04",
+      "topic": "Prompt library",
+      "question": "How many prompts exist, which stages use them, and are they shared or specialized? Can we get anonymized examples?",
+      "default": "Title + category + prompt required; optional metadata; version history; category mapped to existing stages. Selection policy remains open.",
+      "status": "partially_answered",
+      "answer": "Category management required; exact prompt inventory, default selection vs stage-by-stage vs preset unresolved."
+    },
+    {
+      "id": "Q05",
+      "topic": "Skills",
+      "question": "What Skills exist, what inputs/outputs and dependencies do they have, and can he export/upload the permitted bundles to API?",
+      "default": "Reference only until verified",
+      "status": "open"
+    },
+    {
+      "id": "Q06",
+      "topic": "Review flow",
+      "question": "Which six approvals truly need the doctor every time? Should H2 be a reusable confirmed preference in later versions?",
+      "default": "Keep H1–H6 per baseline until explicitly revised",
+      "status": "open"
+    },
+    {
+      "id": "Q07",
+      "topic": "Lecture defaults",
+      "question": "Should audience, language, duration, PDF style, speaker count and voice choices come from prompt presets, profile defaults, or be asked each run?",
+      "default": "Visible profile/prompt defaults with Advanced overrides",
+      "status": "open"
+    },
+    {
+      "id": "Q08",
+      "topic": "Notifications",
+      "question": "Which channels, quiet hours, reminder frequency, and does he want one digest for multiple approvals or immediate events?",
+      "default": "In-app immediate; email/push simulated configurable",
+      "status": "partially_answered",
+      "answer": "Immediately per pending approval; actual channel configuration/quiet hours remain open"
+    },
+    {
+      "id": "Q09",
+      "topic": "Budget",
+      "question": "Is $10–20 per month, per project or initial trial? Is it a hard cap?",
+      "default": "Unconfirmed; mock only",
+      "status": "partially_answered",
+      "answer": "USD $10–20 per month; hard cap remains open"
+    },
+    {
+      "id": "Q10",
+      "topic": "Branding",
+      "question": "Name Lecture Studio or personal brand? Is there a logo, existing palette or a website he likes?",
+      "default": "Lecture Studio",
+      "status": "open"
+    },
+    {
+      "id": "Q11",
+      "topic": "Review editing",
+      "question": "Does he want direct editing of generated Markdown/text or just feedback and regeneration?",
+      "default": "Review and request changes; direct editing candidate",
+      "status": "answered_by_developer",
+      "answer": "Both direct editing and feedback/regeneration depending on stage"
+    },
+    {
+      "id": "Q12",
+      "topic": "Sources",
+      "question": "Typical lecture source types, sizes and examples? Are original slides/notes in English or Arabic?",
+      "default": "File or pasted notes; validate actual supported file types later",
+      "status": "open"
+    },
+    {
+      "id": "Q13",
+      "topic": "Review layout",
+      "question": "Does the doctor prefer side-by-side source/draft with sticky actions or full-width document reading and a collapsible source pane?",
+      "default": "Side-by-side on laptop; single-column fallback",
+      "status": "open"
+    },
+    {
+      "id": "Q14",
+      "topic": "Navigation density",
+      "question": "Expanded labeled sidebar or collapsible sidebar? Cards or table for lecture lists?",
+      "default": "Expanded sidebar, prioritized review list and compact lecture table",
+      "status": "open"
+    },
+    {
+      "id": "Q15",
+      "topic": "Prompt selection",
+      "question": "Saved stage defaults, deliberate selection at each gate, or reusable lecture presets?",
+      "default": "Stage defaults with optional override; prototype supports explicit selection; validate before locking V1",
+      "status": "open"
+    }
+  ],
+  "decision_log": [
+    {
+      "id": "DEC01",
+      "status": "proposed",
+      "decision": "Prototype first, then loop back to requirements validation; no backend architecture commitment."
+    },
+    {
+      "id": "DEC02",
+      "status": "user_requested",
+      "decision": "API-first functional V1, with local automation considered later if expensive."
+    },
+    {
+      "id": "DEC03",
+      "status": "proposed",
+      "decision": "Review-first dashboard, master prompt versions, separate Skills library, mobile-friendly reviews."
+    },
+    {
+      "id": "DEC04",
+      "status": "baseline_preserved",
+      "decision": "Keep six approvals and existing invalidation/rejection semantics."
+    },
+    {
+      "id": "DEC05",
+      "status": "open",
+      "decision": "API Skills/video feasibility, actual provider pricing and hard cap, exact device/browser, branding, notification preferences and real throughput need validation. Monthly budget period is confirmed."
+    },
+    {
+      "id": "DEC06",
+      "status": "user_requested",
+      "decision": "Dashboard A, navy/teal, light mode first, laptop-first, direct edit plus AI feedback, immediate notifications."
+    },
+    {
+      "id": "DEC07",
+      "status": "user_requested",
+      "decision": "Required prompt category, user-managed category library, separate repository, AI-driven visual design, local phased commits only."
+    },
+    {
+      "id": "DEC08",
+      "status": "proposed",
+      "decision": "Use category-to-stage mapping, stage-filtered selectors and editable defaults as a reversible prototype choice; exact selection policy remains undecided."
+    }
+  ],
+  "implementation_phases": [
+    {
+      "phase": 0,
+      "name": "Bootstrap and design system",
+      "commit": "chore: initialize lecture studio prototype"
+    },
+    {
+      "phase": 1,
+      "name": "Dashboard and navigation",
+      "commit": "feat: build lecture workspace dashboard"
+    },
+    {
+      "phase": 2,
+      "name": "Lecture intake, prompt categories, library, skills and settings",
+      "commit": "feat: add lecture setup and reusable prompt library"
+    },
+    {
+      "phase": 3,
+      "name": "Deterministic workflow and all six review gates",
+      "commit": "feat: simulate lecture production and human approvals"
+    },
+    {
+      "phase": 4,
+      "name": "Notifications, recovery, deliverables and persistence",
+      "commit": "feat: complete simulated lecture lifecycle"
+    },
+    {
+      "phase": 5,
+      "name": "Visual QA, accessibility, E2E and stakeholder demo",
+      "commit": "test: verify prototype journeys and refine usability"
+    }
+  ],
+  "design_validation_loop": {
+    "first_pass": "Build selected direction immediately, then capture actual desktop screens and review with developer. Do not block on low-impact aesthetic preferences.",
+    "review_questions": [
+      "Sidebar density",
+      "Typeface and size",
+      "Review split layout",
+      "Default prompt selection",
+      "Status wording",
+      "Edit vs regenerate UX",
+      "Notification presentation",
+      "Brand name/logo",
+      "Information density",
+      "Mobile secondary use"
+    ],
+    "feedback_policy": "Record proposed choices and alternatives; refine PRD and user stories based on feedback. Do not introduce backend scope without approval."
+  }
+}
