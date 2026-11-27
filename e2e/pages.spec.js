@@ -40,7 +40,11 @@ async function finishJobs(page) {
 }
 
 async function shot(page, name, full = false) {
-  if (SHOTS) await page.screenshot({ path: `${SHOTS}/${name}.png`, fullPage: full })
+  if (!SHOTS) return
+  await page.waitForLoadState('networkidle')
+  await expect(page.locator('[aria-busy="true"]')).toHaveCount(0)
+  await page.waitForTimeout(300)
+  await page.screenshot({ path: `${SHOTS}/${name}.png`, fullPage: full })
 }
 
 const project = (page, title) => page.evaluate((t) => window.__lectureStudio.getState().projects.find((p) => p.title === t), title)

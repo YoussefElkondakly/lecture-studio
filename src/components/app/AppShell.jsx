@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import {
   Bell, ClipboardCheck, FlaskConical, House, Library, Menu, Plus, ScrollText, Settings, Shapes,
@@ -10,6 +10,7 @@ import { Button, ButtonLink } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { NotificationBell } from './NotificationBell.jsx'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export function BrandMark({ className }) {
   return (
@@ -80,6 +81,16 @@ function NavItems({ onNavigate, mobile }) {
         )
       })}
     </ul>
+  )
+}
+
+function PageFallback() {
+  return (
+    <div className="flex flex-col gap-4" aria-busy="true" aria-label="Loading page">
+      <Skeleton className="h-10 w-72 max-w-full" />
+      <Skeleton className="h-5 w-96 max-w-full" />
+      <Skeleton className="h-64 w-full" />
+    </div>
   )
 }
 
@@ -178,7 +189,10 @@ export function AppShell() {
         </header>
 
         <main id="main" tabIndex={-1} className="mx-auto max-w-[1320px] px-4 pt-6 pb-24 outline-none md:px-8 md:pt-8">
-          <Outlet />
+          {/* Only the page area shows a loading state; navigation and header stay in place. */}
+          <Suspense fallback={<PageFallback />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
 

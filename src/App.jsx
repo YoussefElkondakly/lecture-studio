@@ -1,37 +1,50 @@
-import { lazy, Suspense } from 'react'
+import { lazy, useEffect } from 'react'
 import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom'
 import { StoreProvider } from '@/state/store.jsx'
 import { AppShell } from '@/components/app/AppShell.jsx'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { Skeleton } from '@/components/ui/skeleton'
 import Home from '@/pages/Home.jsx'
 import { ScrollToTop } from '@/components/app/ScrollToTop.jsx'
 
-const Lectures = lazy(() => import('@/pages/Lectures.jsx'))
-const NewLecture = lazy(() => import('@/pages/NewLecture.jsx'))
-const LectureDetail = lazy(() => import('@/pages/LectureDetail.jsx'))
-const Reviews = lazy(() => import('@/pages/Reviews.jsx'))
-const ReviewWorkspace = lazy(() => import('@/pages/review/ReviewWorkspace.jsx'))
-const Prompts = lazy(() => import('@/pages/Prompts.jsx'))
-const PromptDetail = lazy(() => import('@/pages/PromptDetail.jsx'))
-const Skills = lazy(() => import('@/pages/Skills.jsx'))
-const Notifications = lazy(() => import('@/pages/Notifications.jsx'))
-const Settings = lazy(() => import('@/pages/Settings.jsx'))
-const NotFound = lazy(() => import('@/pages/NotFound.jsx'))
+// Screens are split into separate chunks. They are prefetched once the browser is idle so that,
+// on the hosted site, navigating never waits on the network after the first page has loaded.
+const pageLoaders = {
+  Lectures: () => import('@/pages/Lectures.jsx'),
+  NewLecture: () => import('@/pages/NewLecture.jsx'),
+  LectureDetail: () => import('@/pages/LectureDetail.jsx'),
+  Reviews: () => import('@/pages/Reviews.jsx'),
+  ReviewWorkspace: () => import('@/pages/review/ReviewWorkspace.jsx'),
+  Prompts: () => import('@/pages/Prompts.jsx'),
+  PromptDetail: () => import('@/pages/PromptDetail.jsx'),
+  Skills: () => import('@/pages/Skills.jsx'),
+  Notifications: () => import('@/pages/Notifications.jsx'),
+  Settings: () => import('@/pages/Settings.jsx'),
+  NotFound: () => import('@/pages/NotFound.jsx'),
+}
+const Lectures = lazy(pageLoaders.Lectures)
+const NewLecture = lazy(pageLoaders.NewLecture)
+const LectureDetail = lazy(pageLoaders.LectureDetail)
+const Reviews = lazy(pageLoaders.Reviews)
+const ReviewWorkspace = lazy(pageLoaders.ReviewWorkspace)
+const Prompts = lazy(pageLoaders.Prompts)
+const PromptDetail = lazy(pageLoaders.PromptDetail)
+const Skills = lazy(pageLoaders.Skills)
+const Notifications = lazy(pageLoaders.Notifications)
+const Settings = lazy(pageLoaders.Settings)
+const NotFound = lazy(pageLoaders.NotFound)
 
-function PageFallback() {
-  return (
-    <div className="flex flex-col gap-4" aria-busy="true" aria-label="Loading page">
-      <Skeleton className="h-10 w-72" />
-      <Skeleton className="h-5 w-96 max-w-full" />
-      <Skeleton className="h-64 w-full" />
-    </div>
-  )
+function usePrefetchPages() {
+  useEffect(() => {
+    const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1200))
+    const id = idle(() => Object.values(pageLoaders).forEach((load) => load().catch(() => {})))
+    return () => (window.cancelIdleCallback ? window.cancelIdleCallback(id) : clearTimeout(id))
+  }, [])
 }
 
 function Providers({ children }) {
   const navigate = useNavigate()
+  usePrefetchPages()
   return (
     <StoreProvider onNavigate={navigate}>
       <TooltipProvider delay={300}>
@@ -50,7 +63,6 @@ export default function App() {
     <BrowserRouter basename={basename}>
       <ScrollToTop />
       <Providers>
-        <Suspense fallback={<PageFallback />}>
           <Routes>
             <Route element={<AppShell />}>
               <Route index element={<Home />} />
@@ -67,7 +79,6 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
-        </Suspense>
       </Providers>
     </BrowserRouter>
   )
