@@ -21,7 +21,7 @@ const FILTERS = [
 const CHANNEL_TEXT = { delivered: 'Shown', simulated: 'Simulated', off: 'Off' }
 
 function Previews({ n }) {
-  const origin = typeof window !== 'undefined' ? window.location.origin : ''
+  const origin = typeof window !== 'undefined' ? `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, '')}` : ''
   return (
     <div className="flex flex-col gap-6">
       <Panel title="Email preview" description={n.channelStatuses.email === 'simulated' ? 'What would be sent. Not sent — simulated.' : 'Email is off for this kind of notification.'}>

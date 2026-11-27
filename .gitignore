@@ -9,3 +9,9 @@ blob-report/
 .DS_Store
 .env
 .env.*
+
+# Local agent tooling and settings — never published
+.claude/
+.agents/
+skills-lock.json
+design-system/

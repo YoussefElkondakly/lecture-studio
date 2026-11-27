@@ -1,16 +1,23 @@
 # Prototype progress
 
-Branch: `feat/interactive-prototype` (local only, never pushed). Base: `main` at `3d8fd6e`.
+Branch: `feat/interactive-prototype` (local only, never pushed). Base: `main` at `a6d8047`.
 
 | Phase | Scope | Commit | Verification |
 |---|---|---|---|
-| 0–3 | Tooling, design tokens, shadcn/Base UI, pure workflow engine + unit tests, synthetic media, all screens including the six review gates | `16eb59c` feat: build lecture studio foundation, workspace and simulated six-gate workflow | `pnpm build`, 22 Vitest tests, screenshots of every route at 1440 px (no overflow, no console errors) |
-| 4 | Complete lifecycle checked end-to-end: D01–D10, accessibility, responsive, CRUD; fixes found by those tests | `5a63a5f` feat: complete simulated lecture lifecycle with end-to-end coverage | 29 Playwright tests pass; axe clean on 16 page states |
-| 5 | UI/UX refinement from screenshot review and an independent guideline audit (20 findings) | `591e252` refactor: refine UI/UX from screenshot review and accessibility audit | 22 unit + 29 E2E pass |
-| 6 | Final verification, documentation, 87 screenshots | docs commit (latest on the branch) | `pnpm build`, production preview smoke test, `pnpm test`, `pnpm test:e2e`, `pnpm screenshots` |
+| 0–3 | Tooling, design tokens, shadcn/Base UI, pure workflow engine + unit tests, synthetic media, all screens including the six review gates | `2cd7f42` feat: build lecture studio foundation, workspace and simulated six-gate workflow | `pnpm build`, 22 Vitest tests, screenshots of every route at 1440 px (no overflow, no console errors) |
+| 4 | Complete lifecycle checked end-to-end: D01–D10, accessibility, responsive, CRUD; fixes found by those tests | `3155d7a` feat: complete simulated lecture lifecycle with end-to-end coverage | 29 Playwright tests pass; axe clean on 16 page states |
+| 5 | UI/UX refinement from screenshot review and an independent guideline audit (20 findings) | `c2eaf76` refactor: refine UI/UX from screenshot review and accessibility audit | 22 unit + 29 E2E pass |
+| 6 | Final verification, documentation, 87 screenshots | `78c46bd` docs: add verification report, design review, demo script and screenshots | `pnpm build`, production preview smoke test, `pnpm test`, `pnpm test:e2e`, `pnpm screenshots` |
 
 Phases 0–3 were built together because the shell, the engine and the screens depend on each other. Splitting them into
 separate commits would have meant committing states that were never run. This is recorded honestly instead.
+
+| 7 | Public GitHub repository, GitHub Pages compatibility, CI/CD | see `git log` on `main` | CI: unit + browser tests, Pages build, hosted-site tests; live-site Playwright verification |
+
+Commit hashes above are those of the **published** history. Before the first push, the unpublished local history
+was rewritten to remove agent tooling and two sensitive phrases (see DECISIONS.md §6). Messages, authors and dates
+are unchanged. Original → published: 3d8fd6e → a6d8047, 16eb59c → 2cd7f42, 5a63a5f → 3155d7a, 591e252 → c2eaf76,
+5949557 → 78c46bd.
 
 ## Notable issues found and fixed during verification
 

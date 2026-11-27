@@ -2,16 +2,19 @@
   "name": "lecture-studio",
   "private": true,
   "version": "0.1.0",
-  "description": "Lecture Studio — interactive, simulated prototype of a human-in-the-loop lecture-to-video workspace.",
+  "description": "Lecture Studio \u2014 interactive, simulated prototype of a human-in-the-loop lecture-to-video workspace.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:pages": "VITE_BASE_PATH=/lecture-studio/ vite build && node scripts/postbuild-pages.mjs",
+    "preview:pages": "vite preview --base=/lecture-studio/",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test --project=desktop",
-    "screenshots": "playwright test --project=screenshots"
+    "screenshots": "playwright test --project=screenshots",
+    "test:pages": "playwright test --project=pages"
   },
   "packageManager": "pnpm@10.12.1",
   "dependencies": {

@@ -42,9 +42,12 @@ function Providers({ children }) {
   )
 }
 
+// Router basename follows Vite's base ('' locally, '/lecture-studio' on GitHub Pages).
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '')
+
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <ScrollToTop />
       <Providers>
         <Suspense fallback={<PageFallback />}>

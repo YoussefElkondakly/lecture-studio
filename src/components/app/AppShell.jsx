@@ -144,6 +144,16 @@ export function AppShell() {
       </aside>
 
       <div className="lg:pl-64">
+        {/* Public demonstration notice — shown on every page */}
+        <div role="note" aria-label="Demonstration prototype notice" className="border-b border-review-line/30 bg-review-bg/70 px-4 py-2 text-sm text-foreground md:px-8">
+          <p className="mx-auto flex max-w-[1320px] items-start gap-2">
+            <FlaskConical aria-hidden className="mt-0.5 size-4 shrink-0 text-review" />
+            <span>
+              <strong className="font-semibold">Demonstration prototype.</strong> AI processing, providers, costs and notifications are simulated with synthetic data.
+              Do not enter real medical records, patient information or API credentials.
+            </span>
+          </p>
+        </div>
         {/* Header */}
         <header className="sticky top-0 z-20 border-b bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/85">
           <div className="mx-auto flex h-16 max-w-[1320px] items-center gap-3 px-4 md:px-8">

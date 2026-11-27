@@ -5,6 +5,9 @@ AI-to-AI hand-offs happen automatically; the doctor is asked only at the six hum
 
 > **Everything is simulated.** No AI provider is called, no API key is requested or stored, no email or push
 > notification is sent, and no money is spent. All lecture content is synthetic and is **not medical guidance**.
+> Do not enter real medical records, patient information or API credentials.
+
+**Live demo:** https://youssefelkondakly.github.io/lecture-studio/ (GitHub Pages, deployed automatically from `main`).
 
 ## Run it
 
@@ -24,6 +27,9 @@ Open **http://localhost:5180**. The first visit loads the synthetic demo automat
 | `pnpm test` | Vitest unit tests for the workflow engine (22 tests) |
 | `pnpm test:e2e` | Playwright browser tests: PRD scenarios D01–D10, accessibility, responsive, CRUD (29 tests) |
 | `pnpm screenshots` | Regenerates `docs/screenshots/` at 1440, 1280, 768, 390 and 320 px |
+| `pnpm build:pages` | Production build for GitHub Pages (base `/lecture-studio/`, adds `404.html` and `.nojekyll`) |
+| `node scripts/serve-pages.mjs` | Serves `dist/` like GitHub Pages at http://127.0.0.1:4174/lecture-studio/ |
+| `PAGES_URL=<site url> pnpm test:pages` | Verifies a deployed (or emulated) Pages site: routes, deep links, assets, downloads, phone layout |
 
 First-time Playwright setup: `pnpm exec playwright install chromium`.
 
@@ -47,6 +53,44 @@ Settings → Demo controls:
 Jobs store a due time. If you close the tab, nothing runs, but on reopening, work that would have finished
 is reconciled immediately and you're told how many jobs finished while you were away. In V1, a real server
 runs jobs around the clock.
+
+## Deployment (GitHub Pages)
+
+```
+local development ──► feature branch ──► pull request / merge ──► main
+                                                                   │
+                          GitHub Actions: .github/workflows/deploy.yml
+                          verify: pnpm install --frozen-lockfile → unit tests → browser tests
+                                  → pnpm build:pages → hosted-site tests against a Pages emulator
+                          deploy (main only, after verify passes): upload-pages-artifact → deploy-pages
+                                                                   │
+                              https://youssefelkondakly.github.io/lecture-studio/
+```
+
+- **Every push to `main` that passes verification updates the public site.** Pushes to other branches and pull
+  requests run the same verification without deploying. A manual run is available from the Actions tab
+  (*Run workflow*). It deploys only when run on `main`.
+- Deployments never overlap (`concurrency: pages`, not cancelled mid-way). A newer push supersedes an older
+  verification run.
+- The workflow uses only the built-in `GITHUB_TOKEN` with the minimum permissions (`contents: read` to verify,
+  `pages: write` + `id-token: write` to deploy). No personal tokens or secrets are stored in the repository.
+- Pages is configured with source **GitHub Actions** (`build_type: workflow`), set once through the GitHub API.
+
+**Routing on static hosting.** The app keeps clean URLs (`/lecture-studio/lectures/:id/review/H1`). Vite builds
+with an absolute base of `/lecture-studio/` (`VITE_BASE_PATH`), and React Router uses the same basename. GitHub Pages
+has no server-side rewrites, so `404.html` is a copy of `index.html`: a refresh or a direct link to any screen loads
+the app, which then renders the screen from the URL. Such first loads return HTTP 404 status with the full app.
+Browsers are unaffected, but link-preview bots may show a 404. Local development is unchanged (base `/`).
+
+**Data on the hosted site** stays in each visitor's browser (`localStorage`). Nothing is sent anywhere, and every
+visitor gets their own synthetic demo.
+
+### Making changes
+
+1. `git switch -c feat/<change>` from `main`, then develop with `pnpm dev`.
+2. Before pushing: `pnpm test && pnpm test:e2e && pnpm build:pages`.
+3. Push the branch (CI verifies it), open a pull request, and merge into `main` when green.
+4. The merge deploys automatically. Watch it in the repository's **Actions** tab.
 
 ## A five-minute walkthrough for Dr. Ashraf
 

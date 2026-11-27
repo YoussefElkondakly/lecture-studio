@@ -81,3 +81,27 @@ building, reversible, to validate with Dr. Ashraf · **Baseline** = preserved fr
 | `shadcn` | Installed (`.agents/skills`) | Base UI components with `tsx: false`, semantic tokens, composition rules |
 | `web-design-guidelines` | **Not installed** | Substitute: an independent audit against the published Vercel Web Interface Guidelines and WCAG 2.2, plus axe-core |
 | `webapp-testing` | **Not installed** (`.claude/skills/webapp-testing` is empty) | Substitute: `@playwright/test` and `@axe-core/playwright` directly (the same tooling the skill wraps) |
+
+## 6. Publication (public repository and GitHub Pages)
+
+1. **Pre-publication history cleanup.** A security scan of the full Git history found no credentials, keys or
+   medical records. It did find content that should not be public, all in the initial commit, which predates the
+   prototype work:
+   - the doctor's age in `prd.json`,
+   - a company project name in the build brief,
+   - local agent tooling (`.claude/`, `.agents/`, `skills-lock.json`, including third-party skill bundles).
+
+   Because nothing had been pushed yet, the local history was rewritten with `git filter-repo`. It removed those
+   paths from every commit and redacted the two phrases. Commit messages, authors and dates are unchanged, and the
+   original history is kept on local, never-pushed `backup/pre-publication-*` branches. The agent files remain on
+   disk and are now in `.gitignore`.
+2. **Routing.** Clean URLs with an absolute Vite base (`/lecture-studio/`) and a matching React Router basename.
+   `404.html` (a copy of `index.html`) is the deep-link fallback. HashRouter was rejected because it changes every
+   URL and deep link. The redirect-script technique was rejected as unnecessary complexity.
+3. **Deployment mechanism.** The official GitHub Pages Actions flow (`upload-pages-artifact` + `deploy-pages`), with
+   the Pages site created once via the API as `build_type: workflow`. The reference project pushed to a `gh-pages`
+   branch because `GITHUB_TOKEN` cannot *create* a Pages site. Creating it once with the owner's credentials removes
+   that limitation, so no build branch is needed.
+4. **Demonstration notice.** Every page shows that this is a demonstration prototype, that AI processing is
+   simulated, and that real medical records, patient information or API credentials must not be entered.
+5. **Commit identity.** Commits keep the author identity already used in the owner's other public repositories.
