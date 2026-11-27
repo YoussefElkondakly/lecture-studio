@@ -5,6 +5,7 @@ name: Verify and deploy to GitHub Pages
 # - Pull requests and pushes to other branches: verification only (unit tests, browser tests, build).
 # - Push to main (or a manual run on main): verification, then the official GitHub Pages
 #   deployment (upload-pages-artifact + deploy-pages). A failed check means nothing is deployed.
+#   After deploying, the live site itself is tested with Playwright (live-check).
 #
 # The Pages site itself was created once with source "GitHub Actions" (build_type=workflow)
 # through the GitHub API, so this workflow needs no admin token: GITHUB_TOKEN with
@@ -28,6 +29,8 @@ jobs:
     concurrency:
       group: verify-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: true
+    outputs:
+      entry: ${{ steps.build.outputs.entry }}
     steps:
       - uses: actions/checkout@v7
 
@@ -60,7 +63,11 @@ jobs:
           retention-days: 7
 
       - name: Production build for GitHub Pages (/lecture-studio/)
-        run: pnpm build:pages
+        id: build
+        run: |
+          pnpm build:pages
+          # The hashed entry file identifies this exact build; live-check waits until Pages serves it.
+          echo "entry=$(grep -o 'assets/index-[A-Za-z0-9_-]*\.js' dist/index.html | head -1)" >> "$GITHUB_OUTPUT"
 
       - name: Verify the Pages build in a GitHub Pages emulator
         run: |
@@ -90,7 +97,55 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v5
+
+  live-check:
+    name: Verify the live site
+    needs: [verify, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+
+      - name: Wait until GitHub Pages serves this build
+        env:
+          PAGE_URL: ${{ needs.deploy.outputs.page_url }}
+          ENTRY: ${{ needs.verify.outputs.entry }}
+        run: |
+          # The Pages CDN can serve the previous version for a short time after a deployment.
+          for i in $(seq 1 36); do
+            if curl -fsS "${PAGE_URL}?check=${GITHUB_RUN_ID}-${i}" | grep -q "$ENTRY"; then echo "Live: $ENTRY"; exit 0; fi
+            sleep 5
+          done
+          echo "Pages did not serve $ENTRY within 3 minutes" >&2
+          exit 1
+
+      - name: Playwright tests against the live site
+        env:
+          PAGES_URL: ${{ needs.deploy.outputs.page_url }}
+          PAGES_SHOTS_DIR: live-screenshots
+        run: |
+          mkdir -p live-screenshots
+          pnpm test:pages
+
+      - name: Upload live-site screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: live-site-verification
+          path: |
+            live-screenshots/
+            playwright-report/
+          retention-days: 14

@@ -45,6 +45,27 @@ reconnect → retry · notification read/unread, filters, simulated delivery log
 Responsive suite: no horizontal overflow on 17 screens at 1440, 1280, 768, 390 and 320 px · prompt CRUD · Skills
 import/verify · H3 storyboard edit · H4 transcript edit · phone menu and sticky decision bar.
 
+## Deployment verification (GitHub Pages)
+
+Live site: https://youssefelkondakly.github.io/lecture-studio/ · Repository: https://github.com/YoussefElkondakly/lecture-studio
+
+| Check | Result |
+|---|---|
+| CI on `main` (install → 22 unit → 29 browser → Pages build → 6 emulator tests → deploy) | Passed on every run |
+| Live-site Playwright suite (`PAGES_URL=… pnpm test:pages`), from a Mac and in CI (`live-check`) | **6 / 6 pass** |
+| Every navigation destination, direct deep links, refresh of nested routes, unknown route → in-app 404 page | Pass |
+| Start lecture → simulated processing → notification deep link → approve (H1 → H2) and reject (H1) | Pass |
+| Pending reviews, prompt categories (create + map), Skills verify, notifications delivery log, settings | Pass |
+| Downloads: Markdown and in-browser PDF (`%PDF-` header verified); sample video plays (metadata loaded) | Pass |
+| Persistence: a decision survives reload | Pass |
+| Fonts (Source Sans 3, Source Serif 4) loaded; favicon, audio, video, captions and poster return 200 | Pass |
+| No request leaves `youssefelkondakly.github.io`, so the site does not depend on localhost or the developer's Mac | Pass |
+| No horizontal overflow and no console errors on 11 screens at 1440, 1280, 768, 390 and 320 px (55 checks) | Pass |
+| Screenshots of the hosted application | `docs/screenshots/live/` |
+
+Expected and harmless: a direct first load of a nested URL returns HTTP 404 status (GitHub Pages serving `404.html`)
+with the full app, and the browser logs that status once. Every in-app navigation and refresh then works normally.
+
 ## Accessibility findings
 
 Target: WCAG 2.2 AA. **This is not a compliance claim.** Automated checks plus manual review only; no assistive-technology user testing yet.

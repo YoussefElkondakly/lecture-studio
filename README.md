@@ -63,6 +63,7 @@ local development ──► feature branch ──► pull request / merge ──
                           verify: pnpm install --frozen-lockfile → unit tests → browser tests
                                   → pnpm build:pages → hosted-site tests against a Pages emulator
                           deploy (main only, after verify passes): upload-pages-artifact → deploy-pages
+                          live-check: waits for the new build on the CDN → Playwright tests the public URL
                                                                    │
                               https://youssefelkondakly.github.io/lecture-studio/
 ```
@@ -75,6 +76,10 @@ local development ──► feature branch ──► pull request / merge ──
 - The workflow uses only the built-in `GITHUB_TOKEN` with the minimum permissions (`contents: read` to verify,
   `pages: write` + `id-token: write` to deploy). No personal tokens or secrets are stored in the repository.
 - Pages is configured with source **GitHub Actions** (`build_type: workflow`), set once through the GitHub API.
+- **Where the tests run:** all tests run on free GitHub Actions runners (unlimited minutes for public repositories).
+  GitHub Pages only serves the finished static files. The `live-check` job tests the public site after every
+  deployment and uploads its screenshots as the `live-site-verification` artifact. A failing live check marks the
+  run red but does not roll back. Fix forward with a new commit to `main`.
 
 **Routing on static hosting.** The app keeps clean URLs (`/lecture-studio/lectures/:id/review/H1`). Vite builds
 with an absolute base of `/lecture-studio/` (`VITE_BASE_PATH`), and React Router uses the same basename. GitHub Pages

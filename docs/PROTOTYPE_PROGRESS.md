@@ -12,7 +12,7 @@ Branch: `feat/interactive-prototype` (local only, never pushed). Base: `main` at
 Phases 0–3 were built together because the shell, the engine and the screens depend on each other. Splitting them into
 separate commits would have meant committing states that were never run. This is recorded honestly instead.
 
-| 7 | Public GitHub repository, GitHub Pages compatibility, CI/CD | see `git log` on `main` | CI: unit + browser tests, Pages build, hosted-site tests; live-site Playwright verification |
+| 7 | Public GitHub repository, GitHub Pages compatibility, CI/CD | `9cdb271` ci: deploy to GitHub Pages…, `4e6b5ef` fix: keep the app shell visible…, then live-check and docs | CI: unit + browser tests, Pages build, emulator tests, deploy, live-site Playwright tests |
 
 Commit hashes above are those of the **published** history. Before the first push, the unpublished local history
 was rewritten to remove agent tooling and two sensitive phrases (see DECISIONS.md §6). Messages, authors and dates
