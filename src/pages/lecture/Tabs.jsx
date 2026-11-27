@@ -10,7 +10,7 @@ import { dateTime, relativeTime, seconds, usd } from '@/lib/format.js'
 import { canRenderPdf, downloadBlob, downloadText, markdownToPdfBlob } from '@/lib/pdf.js'
 import { chunkManifest, slug, storyboardMarkdown, transcriptsText } from '@/lib/exports.js'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { DemoTag, KeyValue, Panel } from '@/components/app/common.jsx'
 import { ToneBadge } from '@/components/app/status.jsx'
@@ -140,7 +140,7 @@ export function HistoryTab({ project: p }) {
   const jobs = state.jobs.filter((j) => j.projectId === p.id)
   const activity = state.activity.filter((x) => x.projectId === p.id)
   return (
-    <div className="grid gap-6 xl:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
       <Panel title="Approval history" description="Append-only. Each decision is bound to the exact version reviewed." className="xl:col-span-2">
         {decisions.length === 0 ? <p className="text-sm text-muted-foreground">No decisions yet.</p> : (
           <ol className="flex flex-col divide-y">
@@ -204,7 +204,7 @@ export function SetupTab({ project: p }) {
   const stages = ['A', 'B', 'B2', 'C', 'D']
   const cost = state.usage.filter((u) => u.projectId === p.id).reduce((s, u) => s + u.estimatedCost, 0)
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <Panel title="Master prompt versions used" description="Exact snapshots — library edits never change them." className="lg:col-span-2">
         <ul className="divide-y">
           {stages.map((st) => {
@@ -281,7 +281,7 @@ export function DeliverablesTab({ project: p, onArchive }) {
           <AlertDescription>Files produced so far are listed below; the lecture is not complete until the final video is approved.</AlertDescription>
         </Alert>
       )}
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <Panel title="Final video" description={render ? `Render v${render.version} · ${seconds(render.durationSeconds)} (simulated length)` : 'Not rendered yet'}>
           {render ? (
             <figure>
@@ -306,7 +306,7 @@ export function DeliverablesTab({ project: p, onArchive }) {
                 {f.unavailable || !f.desc ? (
                   <ToneBadge tone="draft">Unavailable</ToneBadge>
                 ) : f.href ? (
-                  <Button size="sm" variant="outline" render={<a href={f.href} download />} nativeButton={false}><Download data-icon="inline-start" /> Sample</Button>
+                  <ButtonLink size="sm" variant="outline" href={f.href} download><Download data-icon="inline-start" /> Sample</ButtonLink>
                 ) : f.action ? (
                   <Button size="sm" variant="outline" onClick={f.action}><Download data-icon="inline-start" /> Download</Button>
                 ) : <ToneBadge tone="draft">Unavailable</ToneBadge>}

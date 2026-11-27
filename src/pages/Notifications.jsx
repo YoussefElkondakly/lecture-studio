@@ -101,7 +101,7 @@ export default function Notifications() {
           {rows.length === 0 ? (
             <EmptyState icon={BellOff} title="Nothing here" description={filter.id === 'all' ? 'Notifications appear when a lecture needs you or a job stops.' : 'No notifications match this filter.'} />
           ) : (
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
               <ul className="flex flex-col divide-y rounded-xl border bg-surface">
                 {rows.map((n) => {
                   const Icon = KIND_ICON[n.kind] || Bell

@@ -62,10 +62,11 @@ function EmptyMedia({
 
 function EmptyTitle({
   className,
+  as: Comp = "h2",
   ...props
 }) {
   return (
-    <div
+    <Comp
       data-slot="empty-title"
       className={cn(
         "text-sm font-medium tracking-tight",

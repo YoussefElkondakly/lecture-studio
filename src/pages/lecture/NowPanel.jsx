@@ -5,7 +5,7 @@ import { useNow, useStore } from '@/state/store.jsx'
 import { FAILURE_CODES, STATION_BY_ID, STATUS } from '@/engine/constants.js'
 import { describeJob, finishRunningJobs, retryProject, startDraft } from '@/engine/workflow.js'
 import { elapsed, relativeTime } from '@/lib/format.js'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { GateCode } from '@/components/app/status.jsx'
 import { DemoTag } from '@/components/app/common.jsx'
 
@@ -35,7 +35,7 @@ export function NowPanel({ project }) {
         <p>Nothing runs until you start. Starting snapshots the selected prompt version and preferences.</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button onClick={() => { act(startDraft, p.id); toast.success('Lecture started') }}><Play data-icon="inline-start" /> Start now</Button>
-          <Button variant="outline" render={<Link to={`/lectures/new?draft=${p.id}`} />} nativeButton={false}><PenLine data-icon="inline-start" /> Edit draft</Button>
+          <ButtonLink as={Link} to={`/lectures/new?draft=${p.id}`} variant="outline"><PenLine data-icon="inline-start" /> Edit draft</ButtonLink>
         </div>
       </Panelish>
     )
@@ -48,7 +48,7 @@ export function NowPanel({ project }) {
         <p>Waiting for {elapsed(p.waitingSince, now)}. Production is paused at this gate until you decide; other lectures keep running.</p>
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <GateCode gate={p.stage} />
-          <Button variant="accent" render={<Link to={`/lectures/${p.id}/review/${p.stage}`} />} nativeButton={false}>Open {p.stage} review</Button>
+          <ButtonLink as={Link} to={`/lectures/${p.id}/review/${p.stage}`} variant="accent">Open {p.stage} review</ButtonLink>
         </div>
       </Panelish>
     )
@@ -68,7 +68,7 @@ export function NowPanel({ project }) {
         <div className="mt-3 flex flex-wrap gap-2">
           <Button onClick={retry}><RotateCw data-icon="inline-start" /> Retry {e.stage}</Button>
           {FIX_LINK[e.code] && (
-            <Button variant="outline" render={<Link to={FIX_LINK[e.code]} />} nativeButton={false}><Settings data-icon="inline-start" /> Fix in Settings</Button>
+            <ButtonLink as={Link} to={FIX_LINK[e.code]} variant="outline"><Settings data-icon="inline-start" /> Fix in Settings</ButtonLink>
           )}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">Error code {e.code} — {FAILURE_CODES[e.code]?.label}. Simulated.</p>
@@ -81,7 +81,7 @@ export function NowPanel({ project }) {
       <Panelish tone="completed" icon={CheckCircle2} title="Completed — all six approvals recorded">
         <p>Finished {relativeTime(p.completedAt, now)}. The final video and every file are in Deliverables.</p>
         <div className="mt-3">
-          <Button variant="outline" render={<Link to={`/lectures/${p.id}?tab=deliverables`} />} nativeButton={false}>Open deliverables</Button>
+          <ButtonLink as={Link} to={`/lectures/${p.id}?tab=deliverables`} variant="outline">Open deliverables</ButtonLink>
         </div>
       </Panelish>
     )

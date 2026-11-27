@@ -10,7 +10,7 @@ import { compatiblePrompts, createProject, getProject, updateDraft, validateInta
 import { updateDefaults } from '@/engine/library.js'
 import { bytes } from '@/lib/format.js'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -130,7 +130,7 @@ export default function NewLecture() {
       <form
         noValidate
         onSubmit={(e) => { e.preventDefault(); submit(true) }}
-        className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
+        className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]"
       >
         <div className="flex min-w-0 flex-col gap-6">
           {errorList.length > 0 && (
@@ -332,7 +332,7 @@ export default function NewLecture() {
               <Button type="button" variant="outline" disabled={submitting} onClick={() => submit(false)}>
                 <Save data-icon="inline-start" /> Save as draft
               </Button>
-              <Button type="button" variant="ghost" render={<Link to={draft ? `/lectures/${draft.id}` : '/'} />} nativeButton={false}>Cancel</Button>
+              <ButtonLink as={Link} variant="ghost" to={draft ? `/lectures/${draft.id}` : '/'}>Cancel</ButtonLink>
             </div>
           </div>
         </aside>

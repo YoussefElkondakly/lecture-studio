@@ -7,7 +7,7 @@ import { STATUS } from '@/engine/constants.js'
 import { archiveProject, duplicateProject, restoreProject } from '@/engine/workflow.js'
 import { relativeTime } from '@/lib/format.js'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger,
@@ -109,9 +109,9 @@ export default function Lectures() {
         title="My lectures"
         description="Every lecture with its current stage. Lectures keep moving on their own between your reviews."
         actions={
-          <Button render={<Link to="/lectures/new" />} nativeButton={false}>
+          <ButtonLink as={Link} to="/lectures/new">
             <Plus data-icon="inline-start" /> Start new lecture
-          </Button>
+          </ButtonLink>
         }
       />
 
@@ -120,7 +120,7 @@ export default function Lectures() {
           icon={FilePlus2}
           title="No lectures yet"
           description="Your lectures will be listed here with their stage, status and next action."
-          action={<Button render={<Link to="/lectures/new" />} nativeButton={false}><Plus data-icon="inline-start" /> Start new lecture</Button>}
+          action={<ButtonLink as={Link} to="/lectures/new"><Plus data-icon="inline-start" /> Start new lecture</ButtonLink>}
         />
       ) : (
         <>
@@ -214,7 +214,7 @@ export default function Lectures() {
                           <TableCell className="hidden py-3.5 text-sm text-muted-foreground lg:table-cell">{relativeTime(p.updatedAt, now)}</TableCell>
                           <TableCell className="py-3.5 pr-5">
                             <div className="flex items-center justify-end gap-1">
-                              <Button size="sm" variant={action.variant || 'outline'} render={<Link to={action.to} />} nativeButton={false}>{action.label}</Button>
+                              <ButtonLink as={Link} to={action.to} size="sm" variant={action.variant || 'outline'}>{action.label}</ButtonLink>
                               <RowMenu p={p} onArchive={setArchiving} />
                             </div>
                           </TableCell>
@@ -240,7 +240,7 @@ export default function Lectures() {
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-sm text-muted-foreground">Updated {relativeTime(p.updatedAt, now)}</span>
-                          <Button size="sm" variant={action.variant || 'outline'} render={<Link to={action.to} />} nativeButton={false}>{action.label}</Button>
+                          <ButtonLink as={Link} to={action.to} size="sm" variant={action.variant || 'outline'}>{action.label}</ButtonLink>
                         </div>
                       </li>
                     )

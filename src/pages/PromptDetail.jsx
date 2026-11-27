@@ -7,7 +7,7 @@ import { PROMPT_STAGES } from '@/engine/constants.js'
 import { archivePrompt, deletePrompt, duplicatePrompt, promptUsage, restorePrompt, setStageDefault } from '@/engine/library.js'
 import { dateTime } from '@/lib/format.js'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ConfirmDialog, EmptyState, PageHeader, Panel } from '@/components/app/common.jsx'
 import { ToneBadge } from '@/components/app/status.jsx'
@@ -23,7 +23,7 @@ export default function PromptDetail() {
   const prompt = state.prompts.find((p) => p.id === id)
 
   if (!prompt) {
-    return <EmptyState icon={FileQuestion} title="Prompt not found" description="It may have been deleted." action={<Button render={<Link to="/prompts" />} nativeButton={false}>Back to Master prompts</Button>} />
+    return <EmptyState icon={FileQuestion} title="Prompt not found" description="It may have been deleted." action={<ButtonLink as={Link} to="/prompts">Back to Master prompts</ButtonLink>} />
   }
 
   const versions = state.promptVersions.filter((v) => v.promptId === id).sort((a, b) => b.version - a.version)
@@ -52,18 +52,16 @@ export default function PromptDetail() {
             ) : (
               <Button variant="outline" onClick={() => { act(archivePrompt, id); toast.success('Prompt archived', { description: 'Lectures that used it keep their versions.' }) }}><Archive data-icon="inline-start" /> Archive</Button>
             )}
-            <Button
-              variant="destructive"
-              aria-disabled={usage.used || undefined}
-              onClick={() => (usage.used ? toast.error('This prompt was used by a lecture. Archive it instead so history stays reproducible.') : setDeleting(true))}
-            >
-              <Trash2 data-icon="inline-start" /> Delete
-            </Button>
+            {!usage.used && (
+              <Button variant="destructive" onClick={() => setDeleting(true)}>
+                <Trash2 data-icon="inline-start" /> Delete
+              </Button>
+            )}
           </>
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="flex min-w-0 flex-col gap-6">
           {prompt.archivedAt && (
             <Alert variant="warning"><AlertTitle>Archived</AlertTitle><AlertDescription>It is hidden from prompt pickers. Restore it to use it again.</AlertDescription></Alert>
@@ -125,6 +123,8 @@ export default function PromptDetail() {
           </Panel>
           <Panel title="Used by lectures">
             {usage.projects.length === 0 ? <p className="text-sm text-muted-foreground">Not used yet. It can be deleted.</p> : (
+              <>
+              <p className="mb-2 text-sm text-muted-foreground">Used prompts can’t be deleted — archive instead, so these lectures stay reproducible.</p>
               <ul className="flex flex-col gap-2">
                 {usage.projects.map((p) => {
                   const ref = Object.values(p.promptRefs).find((r) => r && r.promptId === id)
@@ -136,6 +136,7 @@ export default function PromptDetail() {
                   )
                 })}
               </ul>
+              </>
             )}
           </Panel>
         </aside>

@@ -6,7 +6,7 @@ import { useNow, useStore } from '@/state/store.jsx'
 import { STATUS } from '@/engine/constants.js'
 import { archiveProject, completedGateCount, duplicateProject, getProject, restoreProject } from '@/engine/workflow.js'
 import { bytes, relativeTime, usd } from '@/lib/format.js'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
@@ -40,7 +40,7 @@ export default function LectureDetail() {
         icon={FileQuestion}
         title="Lecture not found"
         description="It may have been removed when the demo was reset."
-        action={<Button render={<Link to="/lectures" />} nativeButton={false}>Back to My lectures</Button>}
+        action={<ButtonLink as={Link} to="/lectures">Back to My lectures</ButtonLink>}
       />
     )
   }
@@ -97,7 +97,7 @@ export default function LectureDetail() {
           <AlertDescription>
             <p>Lecture content generation is queued with the selected prompt version. You can go back to your dashboard now — you’ll be notified as soon as the medical content review (H1) is ready.</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              <Button size="sm" render={<Link to="/" />} nativeButton={false}>Back to Home</Button>
+              <ButtonLink as={Link} to="/" size="sm">Back to Home</ButtonLink>
               <Button size="sm" variant="ghost" onClick={() => setTab('overview')}><X data-icon="inline-start" /> Dismiss</Button>
             </div>
           </AlertDescription>
@@ -125,7 +125,7 @@ export default function LectureDetail() {
         </div>
 
         <TabsContent value="overview" className="pt-6">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
             <div className="flex min-w-0 flex-col gap-6">
               <NowPanel project={p} />
               <Panel title="Source">

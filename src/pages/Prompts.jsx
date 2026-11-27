@@ -63,7 +63,7 @@ export default function Prompts() {
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
         <nav aria-label="Prompt categories" className="lg:sticky lg:top-24 lg:self-start">
           <h2 className="mb-2 text-sm font-semibold text-muted-foreground">Categories</h2>
           <ul className="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">

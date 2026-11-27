@@ -7,7 +7,7 @@ import { dashboardCounts, pendingReviews, retryProject } from '@/engine/workflow
 import { STATION_BY_ID, STATUS } from '@/engine/constants.js'
 import { elapsed, greeting, longDate, plural, relativeTime } from '@/lib/format.js'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { GateCode, StageLabel, StatusBadge } from '@/components/app/status.jsx'
 import { GatePips } from '@/components/app/ProductionRail.jsx'
@@ -55,14 +55,9 @@ function ReviewRow({ item, now }) {
         <Clock3 aria-hidden className="size-4" />
         <span><span className="sr-only">Waiting for </span>{elapsed(since, now)}</span>
       </p>
-      <Button
-        render={<Link to={`/lectures/${project.id}/review/${gate}`} />}
-        nativeButton={false}
-        variant="accent"
-        aria-label={`Review ${gate} ${st.name} for ${project.title}`}
-      >
+      <ButtonLink as={Link} to={`/lectures/${project.id}/review/${gate}`} variant="accent" aria-label={`Review ${gate} ${st.name} for ${project.title}`}>
         Review
-      </Button>
+      </ButtonLink>
     </li>
   )
 }
@@ -154,9 +149,9 @@ export default function Home() {
             Review pending
             <span className="ml-1 rounded-sm bg-review-bg px-1.5 text-sm text-review tabular">{reviews.length}</span>
           </Button>
-          <Button size="lg" render={<Link to="/lectures/new" />} nativeButton={false}>
+          <ButtonLink as={Link} to="/lectures/new" size="lg">
             <Plus data-icon="inline-start" /> Start new lecture
-          </Button>
+          </ButtonLink>
         </div>
       </section>
 
@@ -170,14 +165,17 @@ export default function Home() {
       </nav>
 
       {isEmpty ? (
-        <EmptyState
-          icon={FilePlus2}
-          title="No lectures yet"
-          description="Start a lecture from a source and a saved master prompt. You can leave right after starting — you’ll be notified when the first review is ready."
-          action={<Button render={<Link to="/lectures/new" />} nativeButton={false}><Plus data-icon="inline-start" /> Start new lecture</Button>}
-        />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.75fr)_minmax(18rem,1fr)]">
+          <EmptyState
+            icon={FilePlus2}
+            title="No lectures yet"
+            description="Start a lecture from a source and a saved master prompt. You can leave right after starting — you’ll be notified when the first review is ready."
+            action={<ButtonLink as={Link} to="/lectures/new"><Plus data-icon="inline-start" /> Start new lecture</ButtonLink>}
+          />
+          <FirstRunChecklist />
+        </div>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.75fr)_minmax(18rem,1fr)]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.75fr)_minmax(18rem,1fr)]">
           <div className="flex min-w-0 flex-col gap-6">
             <section aria-labelledby="waiting" className="rounded-xl border border-review-line/40 bg-surface">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-review-line/25 bg-review-bg/45 px-5 py-4">
@@ -241,7 +239,7 @@ export default function Home() {
                 <AlertDescription>
                   <p>{p.error?.message}. {p.error?.fix}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    <Button size="sm" variant="outline" render={<Link to={`/lectures/${p.id}`} />} nativeButton={false}>Open lecture</Button>
+                    <ButtonLink as={Link} to={`/lectures/${p.id}`} size="sm" variant="outline">Open lecture</ButtonLink>
                     <Button size="sm" variant="outline" onClick={() => retry(p)}><RotateCw data-icon="inline-start" /> Retry</Button>
                   </div>
                 </AlertDescription>
@@ -257,7 +255,7 @@ export default function Home() {
                   {drafts.map((p) => (
                     <li key={p.id} className="flex items-center gap-3 px-5 py-3">
                       <span className="min-w-0 flex-1 truncate text-sm font-medium">{p.title}</span>
-                      <Button size="sm" variant="outline" render={<Link to={`/lectures/${p.id}`} />} nativeButton={false}>Resume</Button>
+                      <ButtonLink as={Link} to={`/lectures/${p.id}`} size="sm" variant="outline">Resume</ButtonLink>
                     </li>
                   ))}
                 </ul>

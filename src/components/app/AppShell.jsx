@@ -6,7 +6,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useStore } from '@/state/store.jsx'
 import { pendingReviews } from '@/engine/workflow.js'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { NotificationBell } from './NotificationBell.jsx'
@@ -157,10 +157,10 @@ export function AppShell() {
               <div className="hidden md:block lg:hidden"><PrototypeIndicator /></div>
               <NotificationBell />
               {!onNewLecture && !pageHasCta && (
-                <Button render={<Link to="/lectures/new" />} nativeButton={false} className="hidden sm:inline-flex">
+                <ButtonLink as={Link} to="/lectures/new" className="hidden sm:inline-flex">
                   <Plus data-icon="inline-start" />
                   Start new lecture
-                </Button>
+                </ButtonLink>
               )}
             </div>
           </div>
@@ -195,9 +195,9 @@ export function AppShell() {
       {/* Phone: persistent primary action */}
       {!onNewLecture && !location.pathname.includes('/review/') && (
         <div className="fixed right-4 bottom-4 z-20 sm:hidden">
-          <Button size="lg" className="shadow-overlay" render={<Link to="/lectures/new" />} nativeButton={false}>
+          <ButtonLink as={Link} to="/lectures/new" size="lg" className="shadow-overlay">
             <Plus data-icon="inline-start" /> New lecture
-          </Button>
+          </ButtonLink>
         </div>
       )}
     </div>

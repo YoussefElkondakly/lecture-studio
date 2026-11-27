@@ -97,7 +97,7 @@ export default function Skills() {
       {list.length === 0 ? (
         <EmptyState icon={Shapes} title="No Skills recorded" description="Add the Skills you use in Claude, then import and verify them when V1 supports it. Choosing NONE at H2 is always possible." action={<Button onClick={() => setAdding(true)}><Plus data-icon="inline-start" /> Add Skill reference</Button>} />
       ) : (
-        <ul className="grid gap-4 xl:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-4 xl:grid-cols-2">
           {list.map((s) => {
             const meta = SKILL_STATUS[s.status]
             const isDefault = !def.none && def.ids.includes(s.id)

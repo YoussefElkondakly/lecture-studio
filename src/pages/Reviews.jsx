@@ -6,7 +6,7 @@ import { pendingReviews } from '@/engine/workflow.js'
 import { last } from '@/engine/util.js'
 import { elapsed } from '@/lib/format.js'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { EmptyState, PageHeader } from '@/components/app/common.jsx'
 import { GateCode } from '@/components/app/status.jsx'
 import { GatePips } from '@/components/app/ProductionRail.jsx'
@@ -59,7 +59,7 @@ export default function Reviews() {
           icon={CheckCircle2}
           title={all.length === 0 ? 'No reviews waiting' : `No ${gate} reviews waiting`}
           description={all.length === 0 ? 'You’re all caught up. You’ll be notified the moment a lecture needs you.' : 'Other stages have reviews waiting.'}
-          action={all.length ? <Button variant="outline" onClick={() => setParams({}, { replace: true })}>Show all stages</Button> : <Button variant="outline" render={<Link to="/" />} nativeButton={false}>Back to Home</Button>}
+          action={all.length ? <Button variant="outline" onClick={() => setParams({}, { replace: true })}>Show all stages</Button> : <ButtonLink as={Link} to="/" variant="outline">Back to Home</ButtonLink>}
         />
       ) : (
         <ul className="flex flex-col gap-3">
@@ -76,9 +76,9 @@ export default function Reviews() {
                   <GatePips project={p} />
                 </div>
               </div>
-              <Button variant="accent" size="lg" render={<Link to={`/lectures/${p.id}/review/${g}`} />} nativeButton={false} aria-label={`Review ${g} for ${p.title}`}>
+              <ButtonLink as={Link} to={`/lectures/${p.id}/review/${g}`} variant="accent" size="lg" aria-label={`Review ${g} for ${p.title}`}>
                 Review
-              </Button>
+              </ButtonLink>
             </li>
           ))}
         </ul>

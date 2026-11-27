@@ -9,7 +9,7 @@ import { markNotificationRead, saveFeedbackDraft } from '@/engine/library.js'
 import { last } from '@/engine/util.js'
 import { elapsed } from '@/lib/format.js'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -299,12 +299,12 @@ export default function ReviewWorkspace() {
   const extrasReady = useMemo(() => extras, [extras])
 
   if (!project) {
-    return <EmptyState icon={FileQuestion} title="Lecture not found" description="It may have been removed when the demo was reset." action={<Button render={<Link to="/reviews" />} nativeButton={false}>Go to Pending reviews</Button>} />
+    return <EmptyState icon={FileQuestion} title="Lecture not found" description="It may have been removed when the demo was reset." action={<ButtonLink as={Link} to="/reviews">Go to Pending reviews</ButtonLink>} />
   }
 
   const station = STATION_BY_ID[gate]
   if (!station || station.kind !== 'gate') {
-    return <EmptyState icon={FileQuestion} title="Unknown review" description={`“${gate}” is not one of the six review gates.`} action={<Button render={<Link to={`/lectures/${project.id}`} />} nativeButton={false}>Open lecture</Button>} />
+    return <EmptyState icon={FileQuestion} title="Unknown review" description={`“${gate}” is not one of the six review gates.`} action={<ButtonLink as={Link} to={`/lectures/${project.id}`}>Open lecture</ButtonLink>} />
   }
 
   // Waiting for an own PDF re-render after a direct H1 edit, or the lecture has moved on.
@@ -328,9 +328,9 @@ export default function ReviewWorkspace() {
                     : progress?.kind === 'done' ? 'All six gates are approved.' : `It is in ${STATION_BY_ID[progress.stage]?.long || 'processing'}. Nothing was approved from this link.`}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              {atGate && <Button variant="accent" render={<Link to={`/lectures/${project.id}/review/${progress.stage}`} />} nativeButton={false}>Open current review ({progress.stage})</Button>}
-              <Button variant="outline" render={<Link to={`/lectures/${project.id}`} />} nativeButton={false}>Open lecture</Button>
-              <Button variant="ghost" render={<Link to="/reviews" />} nativeButton={false}>Pending reviews</Button>
+              {atGate && <ButtonLink as={Link} to={`/lectures/${project.id}/review/${progress.stage}`} variant="accent">Open current review ({progress.stage})</ButtonLink>}
+              <ButtonLink as={Link} to={`/lectures/${project.id}`} variant="outline">Open lecture</ButtonLink>
+              <ButtonLink as={Link} to="/reviews" variant="ghost">Pending reviews</ButtonLink>
             </div>
           </AlertDescription>
         </Alert>
@@ -412,7 +412,7 @@ export default function ReviewWorkspace() {
         breadcrumbs={[{ label: 'Pending reviews', to: '/reviews' }, { label: project.title, to: `/lectures/${project.id}` }, { label: gate }]}
         title={<span className="flex flex-wrap items-center gap-3"><GateCode gate={gate} className="h-9 min-w-12 text-base" /> {station.long}</span>}
         description={<span>{project.title} · {project.prefs.language}{project.approvals[gate] ? ' · requested again after a change' : ''}</span>}
-        actions={<Button variant="ghost" render={<Link to={`/lectures/${project.id}?tab=history`} />} nativeButton={false}><History data-icon="inline-start" /> History</Button>}
+        actions={<ButtonLink as={Link} to={`/lectures/${project.id}?tab=history`} variant="ghost"><History data-icon="inline-start" /> History</ButtonLink>}
       />
 
       {staleLink && (
@@ -433,7 +433,7 @@ export default function ReviewWorkspace() {
         </Alert>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_17.5rem]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_17.5rem]">
         <div className="min-w-0">
           <View project={project} fp={currentFp} extras={extrasReady} setExtras={setExtras} onEdited={() => { ownEdit.current = true }} />
         </div>

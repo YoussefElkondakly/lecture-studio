@@ -55,3 +55,11 @@ function Button({
 }
 
 export { Button, buttonVariants }
+
+/** Navigation styled as a button: a real link (announced as a link, supports open-in-new-tab). */
+function ButtonLink({ className, variant = "default", size = "default", as: As, ...props }) {
+  const Comp = As || "a"
+  return <Comp data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} />
+}
+
+export { ButtonLink }

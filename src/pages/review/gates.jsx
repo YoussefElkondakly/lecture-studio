@@ -108,7 +108,7 @@ export function H1Review({ project, fp, extras, setExtras, onEdited }) {
         </Alert>
       )}
 
-      <div className={cn('grid gap-6', showSource && !editing && 'xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]')}>
+      <div className={cn('grid grid-cols-1 gap-6', showSource && !editing && 'xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]')}>
         {showSource && !editing && (
           <section aria-labelledby="src-h" className="min-w-0 rounded-xl border bg-surface">
             <div className="flex items-center justify-between gap-2 border-b px-5 py-3">
@@ -277,7 +277,7 @@ export function H2Review({ project, extras, setExtras }) {
       </Panel>
 
       <Panel title="Prompts for the next stages" description="Pre-filled with your saved defaults. Only prompts mapped to each stage are offered.">
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <PromptPicker stage="B" id="next-B" value={extras.nextPrompts?.B} onChange={(v) => setExtras((x) => ({ ...x, nextPrompts: { ...x.nextPrompts, B: v } }))} />
           <PromptPicker stage="B2" id="next-B2" value={extras.nextPrompts?.B2} onChange={(v) => setExtras((x) => ({ ...x, nextPrompts: { ...x.nextPrompts, B2: v } }))} />
         </div>
@@ -325,7 +325,7 @@ export function H3Review({ project, fp, extras, setExtras, onEdited }) {
       {editing && <p className="text-sm text-muted-foreground">Edit on-screen text, visual descriptions or notes. Saving creates storyboard v{sb.version + 1}; draft frames are redrawn from your text.</p>}
       <ol className="flex flex-col gap-3">
         {(editing ? scenes : sb.scenes).map((s) => (
-          <li key={s.id} className={cn('grid gap-4 rounded-xl border bg-surface p-4 md:grid-cols-[14rem_minmax(0,1fr)]', selected.includes(s.id) && 'border-review-line ring-2 ring-review-line/30')}>
+          <li key={s.id} className={cn('grid grid-cols-1 gap-4 rounded-xl border bg-surface p-4 md:grid-cols-[14rem_minmax(0,1fr)]', selected.includes(s.id) && 'border-review-line ring-2 ring-review-line/30')}>
             <DraftFrame scene={s} rtl={rtl} className="w-full rounded-md" />
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
@@ -516,7 +516,7 @@ export function H5Review({ project, extras, setExtras }) {
           const x = au[c.id]
           const out = x.measuredSeconds < CHUNK_MIN_S || x.measuredSeconds > CHUNK_MAX_S
           return (
-            <li key={c.id} className={cn('grid gap-3 rounded-xl border bg-surface px-4 py-3 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center', selected.includes(c.id) && 'border-review-line ring-2 ring-review-line/30')}>
+            <li key={c.id} className={cn('grid grid-cols-1 gap-3 rounded-xl border bg-surface px-4 py-3 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center', selected.includes(c.id) && 'border-review-line ring-2 ring-review-line/30')}>
               <div className="flex items-center gap-3">
                 <span className="font-serif text-lg font-semibold tabular">{c.id}</span>
                 <span className="text-sm text-muted-foreground tabular">v{x.version}</span>
@@ -559,7 +559,7 @@ export function H6Review({ project, extras, setExtras }) {
   const report = useMemo(() => renderReport(project, render), [project, render])
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <Panel title={`Final video — render v${render.version}`} description={`${seconds(render.durationSeconds)} simulated length · gap ${render.gapSeconds} s · fade ${render.fadeSeconds} s`}>
           <video controls preload="metadata" poster={`${base}samples/final-video-poster.jpg`} src={`${base}samples/final-video-sample.mp4`} className="aspect-video w-full rounded-lg bg-navy">
             <track kind="captions" />

@@ -146,7 +146,7 @@ function ProvidersSection() {
         <AlertTitle>Never enter real API keys here</AlertTitle>
         <AlertDescription>The prototype only offers demo accounts with fake, masked credentials. In V1 keys are stored securely on the server by the administrator — never in the browser.</AlertDescription>
       </Alert>
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <ProviderCard id="google" />
         <ProviderCard id="anthropic" />
       </div>
@@ -346,7 +346,7 @@ export default function Settings() {
   return (
     <div>
       <PageHeader title="Settings" description="Everything here is simulated. No real credentials, providers, notifications or charges." />
-      <div className="grid gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">
         <nav aria-label="Settings sections" className="lg:sticky lg:top-24 lg:self-start">
           <ul className="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
             {SECTIONS.map((s) => (

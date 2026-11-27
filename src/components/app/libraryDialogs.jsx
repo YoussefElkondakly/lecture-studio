@@ -127,20 +127,21 @@ export function CategoryManagerDialog({ open, onOpenChange }) {
           ) : (
             <Button size="sm" variant="outline" onClick={() => { const r = act(restoreCategory, c.id); r.ok ? toast.success('Category restored') : toast.error(r.error) }}><ArchiveRestore data-icon="inline-start" /> Restore</Button>
           )}
-          <Button
-            size="sm"
-            variant="ghost"
-            aria-label={`Delete ${c.name}`}
-            title={refs.total ? 'Referenced by prompts or lecture history — archive instead' : 'Delete permanently'}
-            aria-disabled={refs.total > 0 || undefined}
-            onClick={() => {
-              if (refs.total) return toast.error('This category is referenced by prompts or lecture history. Archive it instead.')
-              const r = act(deleteCategory, c.id)
-              r.ok ? toast.success('Category deleted') : toast.error(r.error)
-            }}
-          >
-            <Trash2 />
-          </Button>
+          {refs.total > 0 ? (
+            <span className="inline-flex h-9 items-center px-2 text-xs text-muted-foreground">In use — archive instead</span>
+          ) : (
+            <Button
+              size="sm"
+              variant="ghost"
+              aria-label={`Delete ${c.name}`}
+              onClick={() => {
+                const r = act(deleteCategory, c.id)
+                r.ok ? toast.success('Category deleted') : toast.error(r.error)
+              }}
+            >
+              <Trash2 />
+            </Button>
+          )}
         </div>
       </li>
     )
