@@ -60,8 +60,8 @@ export function VersionsTab({ project: p }) {
                 key={c.id} label="r" version={c.version} current={c === curContent} rejected={rej(c.id)} producer={c.producer} note={c.note} at={c.createdAt}
                 actions={
                   <>
-                    <Button size="xs" variant="outline" onClick={() => downloadText(c.md, `${slug(p.title)}_lecture_master_r${c.version}.md`, 'text/markdown')}><Download /> .md</Button>
-                    <Button size="xs" variant="outline" disabled={c.pdf.status !== 'ready'} onClick={() => downloadContentPdf(p, c)}><Download /> PDF</Button>
+                    <Button size="sm" variant="outline" aria-label={`.md — download revision r${c.version}`} onClick={() => downloadText(c.md, `${slug(p.title)}_lecture_master_r${c.version}.md`, 'text/markdown')}><Download /> .md</Button>
+                    <Button size="sm" variant="outline" aria-label={`PDF — download revision r${c.version}`} disabled={c.pdf.status !== 'ready'} onClick={() => downloadContentPdf(p, c)}><Download /> PDF</Button>
                   </>
                 }
               />
@@ -74,7 +74,7 @@ export function VersionsTab({ project: p }) {
           <ul className="divide-y">
             {[...a.storyboard].reverse().map((s) => (
               <VersionRow key={s.id} label="v" version={s.version} current={s === last(a.storyboard)} rejected={rej(s.id)} producer={s.producer} note={s.note} at={s.createdAt}
-                actions={<Button size="xs" variant="outline" onClick={() => downloadText(storyboardMarkdown(p, s), `${slug(p.title)}_storyboard_v${s.version}.md`, 'text/markdown')}><Download /> .md</Button>}
+                actions={<Button size="sm" variant="outline" aria-label={`.md — download storyboard v${s.version}`} onClick={() => downloadText(storyboardMarkdown(p, s), `${slug(p.title)}_storyboard_v${s.version}.md`, 'text/markdown')}><Download /> .md</Button>}
               />
             ))}
           </ul>
@@ -286,7 +286,7 @@ export function DeliverablesTab({ project: p, onArchive }) {
           {render ? (
             <figure>
               <video controls preload="metadata" poster={`${base}samples/final-video-poster.jpg`} className="aspect-video w-full rounded-lg bg-navy" src={`${base}samples/final-video-sample.mp4`}>
-                <track kind="captions" />
+                <track kind="captions" srcLang="en" label="English (sample)" src={`${base}samples/final-video-sample.vtt`} default />
               </video>
               <figcaption className="mt-2 text-sm text-muted-foreground">
                 Synthetic sample clip (about 20 s) standing in for the real render. {ar ? 'The real Arabic video would use the approved Egyptian Arabic voices.' : ''}
@@ -308,7 +308,7 @@ export function DeliverablesTab({ project: p, onArchive }) {
                 ) : f.href ? (
                   <ButtonLink size="sm" variant="outline" href={f.href} download><Download data-icon="inline-start" /> Sample</ButtonLink>
                 ) : f.action ? (
-                  <Button size="sm" variant="outline" onClick={f.action}><Download data-icon="inline-start" /> Download</Button>
+                  <Button size="sm" variant="outline" aria-label={`Download ${f.name}`} onClick={f.action}><Download data-icon="inline-start" /> Download</Button>
                 ) : <ToneBadge tone="draft">Unavailable</ToneBadge>}
               </li>
             ))}

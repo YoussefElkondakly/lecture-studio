@@ -47,5 +47,6 @@ ffmpeg -loglevel error -y -f concat -safe 0 -i "$TMP/list.txt" -i "$TMP/narr.wav
   -c:a aac -b:a 64k -shortest -movflags +faststart "$OUT/final-video-sample.mp4"
 # Poster image
 ffmpeg -loglevel error -y -ss 0.5 -i "$OUT/final-video-sample.mp4" -frames:v 1 -q:v 4 "$OUT/final-video-poster.jpg"
+python3 scripts/make-captions.py
 rm -rf "$TMP"
 ls -la "$OUT"

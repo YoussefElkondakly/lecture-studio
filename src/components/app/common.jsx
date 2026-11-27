@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -58,7 +58,7 @@ export function NativeSelect({ className, children, invalid, ...props }) {
     <div className={cn('relative', className)}>
       <select
         aria-invalid={invalid || undefined}
-        className="h-10 w-full appearance-none rounded-md border border-input bg-surface py-1 pr-10 pl-3 text-base text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-55 aria-invalid:border-destructive"
+        className="h-10 w-full appearance-none rounded-md border border-input bg-surface py-1 pr-10 pl-3 text-base text-foreground outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-55 aria-invalid:border-destructive"
         {...props}
       >
         {children}
@@ -158,4 +158,26 @@ export function DemoTag({ children = 'Simulated', className }) {
       {children}
     </span>
   )
+}
+
+/** Warn before the tab is closed or reloaded while there are unsaved edits. */
+export function useUnsavedGuard(dirty) {
+  useEffect(() => {
+    if (!dirty) return undefined
+    const onBeforeUnload = (e) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [dirty])
+}
+
+export function confirmDiscard(dirty) {
+  return !dirty || window.confirm('Discard your unsaved changes?')
+}
+
+export function InlineError({ children }) {
+  if (!children) return null
+  return <p role="alert" className="rounded-md border border-blocked/30 bg-blocked-bg px-3 py-2 text-sm font-medium text-blocked">{children}</p>
 }

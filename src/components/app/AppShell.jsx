@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import {
   Bell, ClipboardCheck, FlaskConical, House, Library, Menu, Plus, ScrollText, Settings, Shapes,
 } from 'lucide-react'
@@ -39,44 +39,46 @@ function useNav() {
 
 function NavItems({ onNavigate, mobile }) {
   const items = useNav().filter((i) => mobile || !i.mobileOnly)
+  const { pathname } = useLocation()
+  // One source of truth for the visual highlight and aria-current. Review pages belong to Pending reviews.
+  const activeTo = pathname.includes('/review/')
+    ? '/reviews'
+    : [...items].sort((a, b) => b.to.length - a.to.length).find((i) => (i.end ? pathname === i.to : pathname === i.to || pathname.startsWith(`${i.to}/`)))?.to
   return (
     <ul className="flex flex-col gap-0.5">
-      {items.map((item) => (
-        <li key={item.to}>
-          <NavLink
-            to={item.to}
-            end={item.end}
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              cn(
+      {items.map((item) => {
+        const isActive = activeTo === item.to
+        return (
+          <li key={item.to}>
+            <Link
+              to={item.to}
+              onClick={onNavigate}
+              aria-current={isActive ? 'page' : undefined}
+              className={cn(
                 'group relative flex h-11 items-center gap-3 rounded-md px-3 text-[0.975rem] font-medium transition-colors',
                 mobile
                   ? isActive ? 'bg-navy-tint text-navy' : 'text-foreground hover:bg-subtle'
                   : isActive ? 'bg-white/12 text-white' : 'text-[#c5d3e0] hover:bg-white/8 hover:text-white',
-              )
-            }
-          >
-            {({ isActive }) => (
-              <>
-                {isActive && !mobile && <span aria-hidden className="absolute top-2 bottom-2 left-0 w-1 rounded-r bg-[#5fd3c6]" />}
-                <item.icon aria-hidden className="size-[1.15rem] shrink-0" />
-                <span className="truncate">{item.label}</span>
-                {item.count > 0 && (
-                  <span
-                    className={cn(
-                      'ml-auto inline-flex h-6 min-w-6 items-center justify-center rounded-md px-1.5 text-xs font-bold tabular',
-                      item.to === '/reviews' ? 'bg-review-bg text-review' : mobile ? 'bg-navy text-white' : 'bg-white/15 text-white',
-                    )}
-                  >
-                    {item.count}
-                    <span className="sr-only"> {item.countLabel}</span>
-                  </span>
-                )}
-              </>
-            )}
-          </NavLink>
-        </li>
-      ))}
+              )}
+            >
+              {isActive && !mobile && <span aria-hidden className="absolute top-2 bottom-2 left-0 w-1 rounded-r bg-[#5fd3c6]" />}
+              <item.icon aria-hidden className="size-[1.15rem] shrink-0" />
+              <span className="truncate">{item.label}</span>
+              {item.count > 0 && (
+                <span
+                  className={cn(
+                    'ml-auto inline-flex h-6 min-w-6 items-center justify-center rounded-md px-1.5 text-xs font-bold tabular',
+                    item.to === '/reviews' ? 'bg-review-bg text-review' : mobile ? 'bg-navy text-white' : 'bg-white/15 text-white',
+                  )}
+                >
+                  {item.count}
+                  <span className="sr-only"> {item.countLabel}</span>
+                </span>
+              )}
+            </Link>
+          </li>
+        )
+      })}
     </ul>
   )
 }
@@ -108,7 +110,6 @@ function PrototypeIndicator({ dark }) {
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
-  const navigate = useNavigate()
   const onNewLecture = location.pathname === '/lectures/new'
   const pageHasCta = ['/', '/lectures'].includes(location.pathname)
 
@@ -184,16 +185,16 @@ export function AppShell() {
             <NavItems mobile onNavigate={() => setMenuOpen(false)} />
           </nav>
           <div className="flex flex-col gap-3 border-t px-5 py-4">
-            <Button onClick={() => { setMenuOpen(false); navigate('/lectures/new') }}>
+            <ButtonLink as={Link} to="/lectures/new" onClick={() => setMenuOpen(false)}>
               <Plus data-icon="inline-start" /> Start new lecture
-            </Button>
+            </ButtonLink>
             <PrototypeIndicator />
           </div>
         </SheetContent>
       </Sheet>
 
       {/* Phone: persistent primary action */}
-      {!onNewLecture && !location.pathname.includes('/review/') && (
+      {!onNewLecture && !pageHasCta && !location.pathname.includes('/review/') && (
         <div className="fixed right-4 bottom-4 z-20 sm:hidden">
           <ButtonLink as={Link} to="/lectures/new" size="lg" className="shadow-overlay">
             <Plus data-icon="inline-start" /> New lecture

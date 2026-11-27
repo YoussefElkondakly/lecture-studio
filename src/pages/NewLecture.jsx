@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { FormRow, NativeSelect, PageHeader, describedBy } from '@/components/app/common.jsx'
+import { FormRow, NativeSelect, PageHeader, describedBy, useUnsavedGuard } from '@/components/app/common.jsx'
 import { ChoiceGroup } from '@/components/app/ChoiceGroup.jsx'
 import { PromptPicker } from '@/components/app/PromptPicker.jsx'
 
@@ -53,6 +53,7 @@ export default function NewLecture() {
   const summaryRef = useRef(null)
 
   const setPref = (k, v) => setPrefs((p) => ({ ...p, [k]: v }))
+  useUnsavedGuard(!submitting && Boolean(title.trim() || notes.trim() || file || demoSourceId) && !draft)
   const plan = useMemo(() => {
     try { return planChunks((Number(prefs.durationMin) || 1) * 60, prefs.timingPolicy) } catch { return null }
   }, [prefs.durationMin, prefs.timingPolicy])
@@ -135,7 +136,7 @@ export default function NewLecture() {
         <div className="flex min-w-0 flex-col gap-6">
           {errorList.length > 0 && (
             <div ref={summaryRef} tabIndex={-1} className="outline-none">
-              <Alert variant="destructive">
+              <Alert variant="destructive" role="alert">
                 <AlertCircle aria-hidden />
                 <AlertTitle>Check {errorList.length === 1 ? 'one field' : `${errorList.length} fields`} before starting</AlertTitle>
                 <AlertDescription>
@@ -157,7 +158,7 @@ export default function NewLecture() {
                   onChange={(e) => setTitle(e.target.value)}
                   aria-invalid={Boolean(errors.title) || undefined}
                   aria-describedby={describedBy('title', { help: true, error: errors.title })}
-                  placeholder="For example: Neonatal jaundice for parents"
+                  placeholder="e.g. Jaundice for parents…"
                   autoComplete="off"
                 />
               </FormRow>

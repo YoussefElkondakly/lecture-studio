@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Bell, BellOff, Mail, MailOpen, Smartphone } from 'lucide-react'
 import { useNow, useStore } from '@/state/store.jsx'
 import { markAllRead, markNotificationRead, markNotificationUnread } from '@/engine/library.js'
 import { dateTime, relativeTime } from '@/lib/format.js'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonLink } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DemoTag, EmptyState, PageHeader, Panel } from '@/components/app/common.jsx'
 import { KIND_ICON, KIND_TONE } from '@/components/app/NotificationBell.jsx'
@@ -63,7 +63,6 @@ function Previews({ n }) {
 export default function Notifications() {
   const { state, act } = useStore()
   const now = useNow()
-  const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
   const filter = FILTERS.find((f) => f.id === params.get('filter')) || FILTERS[0]
   const rows = state.notifications.filter(filter.match)
@@ -71,10 +70,6 @@ export default function Notifications() {
   const selected = state.notifications.find((n) => n.id === selectedId) || rows[0]
   const unread = state.notifications.filter((n) => !n.readAt).length
 
-  const open = (n) => {
-    act(markNotificationRead, n.id)
-    if (n.deepLink) navigate(n.deepLink)
-  }
 
   return (
     <div>
@@ -121,8 +116,8 @@ export default function Notifications() {
                           {n.resolvedAt && <span className="font-semibold">Resolved — {n.resolution}</span>}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-2">
-                          {n.deepLink && <Button size="sm" variant={n.kind === 'review' && !n.resolvedAt ? 'accent' : 'outline'} onClick={() => open(n)}>{n.kind === 'review' && !n.resolvedAt ? 'Open review' : 'Open'}</Button>}
-                          <Button size="sm" variant="ghost" onClick={() => act(n.readAt ? markNotificationUnread : markNotificationRead, n.id)}>{n.readAt ? 'Mark unread' : 'Mark read'}</Button>
+                          {n.deepLink && <ButtonLink as={Link} to={n.deepLink} size="sm" variant={n.kind === 'review' && !n.resolvedAt ? 'accent' : 'outline'} onClick={() => act(markNotificationRead, n.id)}>{n.kind === 'review' && !n.resolvedAt ? 'Open review' : 'Open'}</ButtonLink>}
+                          <Button size="sm" variant="ghost" aria-label={`${n.readAt ? 'Mark unread' : 'Mark read'}: ${n.title}`} onClick={() => act(n.readAt ? markNotificationUnread : markNotificationRead, n.id)}>{n.readAt ? 'Mark unread' : 'Mark read'}</Button>
                           <Button size="sm" variant="ghost" className="xl:inline-flex" onClick={() => setSelectedId(n.id)} aria-pressed={selected?.id === n.id}>Preview email &amp; push</Button>
                         </div>
                       </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   AlertTriangle, Bell, CheckCircle2, CircleDollarSign, FastForward, FlaskConical, KeyRound, ListChecks, PlugZap, RotateCcw, Unplug, UserRound, XCircle,
 } from 'lucide-react'
@@ -340,7 +340,7 @@ function DemoSection() {
 const RENDER = { profile: ProfileSection, defaults: DefaultsSection, providers: ProvidersSection, notifications: NotificationsSection, budget: BudgetSection, demo: DemoSection }
 
 export default function Settings() {
-  const [params, setParams] = useSearchParams()
+  const [params] = useSearchParams()
   const section = SECTIONS.some((s) => s.id === params.get('section')) ? params.get('section') : 'providers'
   const Section = RENDER[section]
   return (
@@ -351,14 +351,13 @@ export default function Settings() {
           <ul className="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible">
             {SECTIONS.map((s) => (
               <li key={s.id} className="shrink-0">
-                <button
-                  type="button"
+                <Link
+                  to={`/settings?section=${s.id}`}
                   aria-current={section === s.id ? 'page' : undefined}
-                  onClick={() => setParams({ section: s.id }, { replace: true })}
                   className={cn('flex h-11 w-full items-center gap-2.5 rounded-md px-3 text-sm font-semibold whitespace-nowrap', section === s.id ? 'bg-navy text-white' : 'hover:bg-subtle')}
                 >
                   <s.icon aria-hidden className="size-4" /> {s.label}
-                </button>
+                </Link>
               </li>
             ))}
           </ul>

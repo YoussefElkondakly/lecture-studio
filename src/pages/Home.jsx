@@ -43,7 +43,7 @@ function ReviewRow({ item, now }) {
     <li className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4">
       <GateCode gate={gate} />
       <div className="min-w-0 flex-1 basis-56">
-        <Link to={`/lectures/${project.id}`} className="block truncate font-semibold text-foreground underline-offset-4 hover:underline">
+        <Link to={`/lectures/${project.id}`} className="block font-semibold text-foreground underline-offset-4 hover:underline">
           {project.title}
         </Link>
         <p className="text-sm text-muted-foreground">
@@ -71,6 +71,7 @@ function FirstRunChecklist() {
     { done: Object.values(state.profile.stageDefaults).every(Boolean), label: 'A default prompt chosen for each stage', to: '/prompts' },
     { done: state.projects.length > 0, label: 'First lecture started', to: '/lectures/new' },
   ]
+  if (items.every((i) => i.done)) return null
   const dismiss = () => {
     const next = clone(state)
     next.meta.onboardingDismissed = true
@@ -144,11 +145,11 @@ export default function Home() {
           <p className="mt-2 text-base text-muted-foreground">{summary}.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button size="lg" variant="outline" disabled={!reviews.length} onClick={() => navigate('/reviews')}>
+          <ButtonLink as={Link} to="/reviews" size="lg" variant="outline">
             <ClipboardCheck data-icon="inline-start" />
             Review pending
             <span className="ml-1 rounded-sm bg-review-bg px-1.5 text-sm text-review tabular">{reviews.length}</span>
-          </Button>
+          </ButtonLink>
           <ButtonLink as={Link} to="/lectures/new" size="lg">
             <Plus data-icon="inline-start" /> Start new lecture
           </ButtonLink>

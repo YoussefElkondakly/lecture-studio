@@ -89,7 +89,7 @@ test('H3 storyboard direct edit creates a new version; H4 transcript edit is tar
   expect(p.stage).toBe('H4')
   // H4: edit chunk 02 only
   await page.goto(`/lectures/${p.id}/review/H4`)
-  await page.getByRole('button', { name: 'Edit chunk 02' }).click()
+  await page.getByRole('button', { name: 'Edit, chunk 02' }).click()
   const box = page.getByLabel('Transcript 02')
   await box.fill((await box.inputValue()) + ' A clarifying sentence added by the doctor.')
   await page.getByRole('button', { name: 'Save new version' }).click()

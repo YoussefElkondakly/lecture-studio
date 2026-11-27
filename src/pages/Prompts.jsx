@@ -31,6 +31,14 @@ export default function Prompts() {
     setParams(next, { replace: true })
   }
 
+  const categoryHref = (id) => {
+    const next = new URLSearchParams(params)
+    if (id === 'all') next.delete('category')
+    else next.set('category', id)
+    const qs = next.toString()
+    return `/prompts${qs ? `?${qs}` : ''}`
+  }
+
   const catById = Object.fromEntries(state.categories.map((c) => [c.id, c]))
   const defaultsFor = (id) => Object.entries(state.profile.stageDefaults).filter(([, pid]) => pid === id).map(([s]) => s)
 
@@ -72,10 +80,9 @@ export default function Prompts() {
               const on = cat === c.id
               return (
                 <li key={c.id} className="shrink-0">
-                  <button
-                    type="button"
+                  <Link
+                    to={categoryHref(c.id)}
                     aria-current={on ? 'true' : undefined}
-                    onClick={() => set('category', c.id)}
                     className={cn('flex min-h-11 w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors', on ? 'bg-navy text-white' : 'hover:bg-subtle')}
                   >
                     <span className="min-w-0 flex-1">
@@ -83,7 +90,7 @@ export default function Prompts() {
                       {c.stageIds && <span className={cn('block text-xs', on ? 'text-[#c5d3e0]' : 'text-muted-foreground')}>{c.stageIds.length ? `Stage ${c.stageIds.join(', ')}` : 'Library only'}</span>}
                     </span>
                     <span className={cn('text-xs tabular', on ? 'text-[#c5d3e0]' : 'text-muted-foreground')}>{n}</span>
-                  </button>
+                  </Link>
                 </li>
               )
             })}

@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { FormRow, NativeSelect, describedBy } from './common.jsx'
+import { ConfirmDialog, FormRow, NativeSelect, describedBy } from './common.jsx'
 
 export function StageChips({ stageIds, className }) {
   if (!stageIds?.length) return <span className={cn('inline-flex h-6 items-center rounded-sm border border-dashed border-[#7c8ea3] px-1.5 text-xs font-semibold text-muted-foreground', className)}>Library only</span>
@@ -97,6 +97,7 @@ export function CategoryManagerDialog({ open, onOpenChange }) {
   const [creating, setCreating] = useState(false)
   const [archiving, setArchiving] = useState(null)
   const [reassignTo, setReassignTo] = useState('')
+  const [deleting, setDeleting] = useState(null)
   const active = state.categories.filter((c) => !c.archivedAt)
   const archived = state.categories.filter((c) => c.archivedAt)
   const activePromptCount = (id) => state.prompts.filter((p) => p.categoryId === id && !p.archivedAt).length
@@ -134,10 +135,7 @@ export function CategoryManagerDialog({ open, onOpenChange }) {
               size="sm"
               variant="ghost"
               aria-label={`Delete ${c.name}`}
-              onClick={() => {
-                const r = act(deleteCategory, c.id)
-                r.ok ? toast.success('Category deleted') : toast.error(r.error)
-              }}
+              onClick={() => setDeleting(c)}
             >
               <Trash2 />
             </Button>
@@ -149,7 +147,7 @@ export function CategoryManagerDialog({ open, onOpenChange }) {
 
   return (
     <>
-      <Dialog open={open && !editing && !creating && !archiving} onOpenChange={onOpenChange}>
+      <Dialog open={open && !editing && !creating && !archiving && !deleting} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Prompt categories</DialogTitle>
@@ -168,6 +166,19 @@ export function CategoryManagerDialog({ open, onOpenChange }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <ConfirmDialog
+        open={Boolean(deleting)}
+        onOpenChange={(o) => !o && setDeleting(null)}
+        title={`Delete “${deleting?.name}” permanently?`}
+        description="It has no prompts and no lecture history, so it can be deleted. This cannot be undone."
+        confirmLabel="Delete category"
+        destructive
+        onConfirm={() => {
+          const r = act(deleteCategory, deleting.id)
+          r.ok ? toast.success('Category deleted') : toast.error(r.error)
+          setDeleting(null)
+        }}
+      />
       <CategoryFormDialog open={Boolean(editing) || creating} onOpenChange={(o) => { if (!o) { setEditing(null); setCreating(false) } }} category={editing} />
       <Dialog open={Boolean(archiving)} onOpenChange={(o) => !o && setArchiving(null)}>
         <DialogContent>

@@ -214,7 +214,7 @@ export default function Lectures() {
                           <TableCell className="hidden py-3.5 text-sm text-muted-foreground lg:table-cell">{relativeTime(p.updatedAt, now)}</TableCell>
                           <TableCell className="py-3.5 pr-5">
                             <div className="flex items-center justify-end gap-1">
-                              <ButtonLink as={Link} to={action.to} size="sm" variant={action.variant || 'outline'}>{action.label}</ButtonLink>
+                              <ButtonLink as={Link} to={action.to} size="sm" variant={action.variant || 'outline'} aria-label={`${action.label}: ${p.title}`}>{action.label}</ButtonLink>
                               <RowMenu p={p} onArchive={setArchiving} />
                             </div>
                           </TableCell>
@@ -240,7 +240,7 @@ export default function Lectures() {
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <span className="text-sm text-muted-foreground">Updated {relativeTime(p.updatedAt, now)}</span>
-                          <ButtonLink as={Link} to={action.to} size="sm" variant={action.variant || 'outline'}>{action.label}</ButtonLink>
+                          <ButtonLink as={Link} to={action.to} size="sm" variant={action.variant || 'outline'} aria-label={`${action.label}: ${p.title}`}>{action.label}</ButtonLink>
                         </div>
                       </li>
                     )

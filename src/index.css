@@ -143,6 +143,8 @@
   }
   html {
     -webkit-text-size-adjust: 100%;
+    /* Keep focused controls clear of the sticky header (WCAG 2.4.11). */
+    scroll-padding-top: 5rem;
     text-rendering: optimizeLegibility;
   }
   body {
@@ -191,11 +193,14 @@
     color: var(--ls-text);
     max-width: 72ch;
   }
-  .doc-prose h1 { font-size: 1.625rem; line-height: 1.25; font-weight: 620; margin: 0 0 0.75rem; }
-  .doc-prose h2 { font-size: 1.25rem; line-height: 1.35; font-weight: 620; margin: 1.75rem 0 0.5rem; }
-  .doc-prose h3 { font-size: 1.0625rem; font-weight: 650; margin: 1.25rem 0 0.375rem; }
+  /* Markdown # → h3, ## → h4, ### → h5 (the review page owns h1/h2). */
+  .doc-prose h3 { font-size: 1.625rem; line-height: 1.25; font-weight: 620; margin: 0 0 0.75rem; }
+  .doc-prose h4 { font-size: 1.25rem; line-height: 1.35; font-weight: 620; margin: 1.75rem 0 0.5rem; }
+  .doc-prose h5 { font-size: 1.0625rem; font-weight: 650; margin: 1.25rem 0 0.375rem; }
   .doc-prose p { margin: 0 0 0.875rem; }
   .doc-prose ul { list-style: disc; padding-inline-start: 1.25rem; margin: 0 0 0.875rem; }
+  /* Mixed-direction items inside RTL documents need room for bullets on either side. */
+  .doc-prose.rtl-content ul { padding-inline: 1.25rem; }
   .doc-prose li { margin: 0.25rem 0; }
   .doc-prose table { width: 100%; border-collapse: collapse; margin: 0.75rem 0 1.25rem; font-family: var(--font-sans); font-size: 0.9375rem; }
   .doc-prose th, .doc-prose td { border: 1px solid var(--ls-border); padding: 0.4rem 0.6rem; text-align: start; vertical-align: top; }
@@ -218,7 +223,7 @@
   .doc-prose .changed-line::after {
     content: " (changed)";
     font-family: var(--font-sans);
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     font-weight: 600;
     color: var(--ls-accent-strong);
   }
@@ -230,6 +235,11 @@
     box-shadow: 0 1px 2px rgb(20 43 69 / 0.08), 0 8px 24px -12px rgb(20 43 69 / 0.25);
     border: 1px solid var(--ls-border);
   }
+}
+
+@media (max-width: 1023px) {
+  /* Phone/tablet: sticky decision bar and floating action at the bottom. */
+  html { scroll-padding-bottom: 5.5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

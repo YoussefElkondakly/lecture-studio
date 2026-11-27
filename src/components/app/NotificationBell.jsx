@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AlertTriangle, Bell, CheckCircle2, Eye } from 'lucide-react'
 import { useNow, useStore } from '@/state/store.jsx'
 import { markAllRead, markNotificationRead } from '@/engine/library.js'
@@ -19,7 +19,6 @@ export const KIND_TONE = {
 export function NotificationBell() {
   const { state, act } = useStore()
   const now = useNow()
-  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const unread = state.notifications.filter((n) => !n.readAt).length
   const recent = state.notifications.slice(0, 6)
@@ -27,7 +26,6 @@ export function NotificationBell() {
   const openItem = (n) => {
     act(markNotificationRead, n.id)
     setOpen(false)
-    if (n.deepLink) navigate(n.deepLink)
   }
 
   return (
@@ -57,8 +55,8 @@ export function NotificationBell() {
               const Icon = KIND_ICON[n.kind] || Bell
               return (
                 <li key={n.id} className="border-b last:border-b-0">
-                  <button
-                    type="button"
+                  <Link
+                    to={n.deepLink || '/notifications'}
                     onClick={() => openItem(n)}
                     className="flex w-full gap-3 px-4 py-3 text-left transition-colors hover:bg-subtle focus-visible:bg-subtle"
                   >
@@ -66,15 +64,15 @@ export function NotificationBell() {
                       <Icon aria-hidden className="size-4" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className={cn('block text-sm leading-snug', !n.readAt ? 'font-semibold' : 'font-medium')}>{n.title}</span>
+                      <span className={cn('block text-sm leading-snug', !n.readAt ? 'font-semibold' : 'font-medium')}>{!n.readAt && <span className="sr-only">Unread: </span>}{n.title}</span>
                       <span className="mt-0.5 line-clamp-2 block text-sm text-muted-foreground">{n.body}</span>
                       <span className="mt-1 block text-xs text-muted-foreground">
                         {relativeTime(n.createdAt, now)}
                         {n.resolvedAt ? ` · ${n.resolution}` : ''}
                       </span>
                     </span>
-                    {!n.readAt && <span className="mt-2 size-2 shrink-0 rounded-full bg-teal" aria-label="Unread" />}
-                  </button>
+                    {!n.readAt && <span aria-hidden className="mt-2 size-2 shrink-0 rounded-full bg-teal" />}
+                  </Link>
                 </li>
               )
             })}

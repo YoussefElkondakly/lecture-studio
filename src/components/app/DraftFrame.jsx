@@ -23,24 +23,25 @@ function wrap(text, max) {
 export function DraftFrame({ scene, rtl, final = false, className }) {
   const c = PALETTES[scene.palette ?? 0]
   const lines = wrap(scene.onScreen, 26)
-  const x = rtl ? 300 : 20
-  const anchor = rtl ? 'end' : 'start'
+  // Direction per string: Arabic lines start at the right edge, English lines at the left.
+  const dirOf = (t) => (/[\u0600-\u06FF]/.test(t) ? { x: 300, direction: 'rtl' } : { x: 20, direction: 'ltr' })
+  const side = /[\u0600-\u06FF]/.test(scene.onScreen) // decoration goes opposite the text
   return (
     <svg viewBox="0 0 320 180" role="img" aria-label={`${final ? 'Final' : 'Draft'} frame ${scene.id}: ${scene.onScreen}`} className={className}>
       <rect width="320" height="180" rx="6" fill={c.bg} />
       {scene.id === 'S01' ? (
-        <circle cx={rtl ? 60 : 260} cy="90" r="46" fill={c.accent} opacity=".25" />
+        <circle cx={side ? 60 : 260} cy="90" r="46" fill={c.accent} opacity=".25" />
       ) : (
         <g opacity=".9">
-          <rect x={rtl ? 20 : 196} y="64" width="104" height="70" rx="4" fill="none" stroke={c.accent} strokeWidth="2" />
-          <path d={rtl ? 'M30 120 L55 98 L75 110 L105 80' : 'M206 120 L231 98 L251 110 L281 80'} stroke={c.accent} strokeWidth="3" fill="none" strokeLinecap="round" />
+          <rect x={side ? 20 : 196} y="64" width="104" height="70" rx="4" fill="none" stroke={c.accent} strokeWidth="2" />
+          <path d={side ? 'M30 120 L55 98 L75 110 L105 80' : 'M206 120 L231 98 L251 110 L281 80'} stroke={c.accent} strokeWidth="3" fill="none" strokeLinecap="round" />
         </g>
       )}
-      <text x={x} y="24" fill={c.sub} fontSize="10" fontFamily="Source Sans 3 Variable, sans-serif" textAnchor={anchor} direction={rtl ? 'rtl' : 'ltr'}>
+      <text {...dirOf(scene.heading)} y="24" fill={c.sub} fontSize="10" fontFamily="Source Sans 3 Variable, sans-serif" textAnchor="start">
         {scene.id} · {scene.heading}
       </text>
       {lines.map((l, i) => (
-        <text key={i} x={x} y={66 + i * 20} fill={c.fg} fontSize="16" fontWeight="600" fontFamily="Source Serif 4 Variable, Georgia, serif" textAnchor={anchor} direction={rtl ? 'rtl' : 'ltr'}>
+        <text key={i} {...dirOf(l)} y={66 + i * 20} fill={c.fg} fontSize="16" fontWeight="600" fontFamily="Source Serif 4 Variable, Georgia, serif" textAnchor="start">
           {l}
         </text>
       ))}

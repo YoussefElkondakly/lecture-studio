@@ -25,7 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Markdown } from '@/components/app/Markdown.jsx'
 import { DraftFrame } from '@/components/app/DraftFrame.jsx'
 import { PromptPicker } from '@/components/app/PromptPicker.jsx'
-import { DemoTag, Panel } from '@/components/app/common.jsx'
+import { DemoTag, InlineError, Panel, confirmDiscard, useUnsavedGuard } from '@/components/app/common.jsx'
 import { ToneBadge } from '@/components/app/status.jsx'
 import { downloadContentPdf } from '@/pages/lecture/Tabs.jsx'
 
@@ -38,12 +38,13 @@ function SectionTitle({ children, aside }) {
   )
 }
 
-function useEditResult(onSaved) {
+function useEditResult(onSaved, setError) {
   return (r, success) => {
     if (r.ok) {
+      setError('')
       toast.success(success)
       onSaved?.()
-    } else toast.error(r.error)
+    } else setError(r.error)
   }
 }
 
@@ -81,13 +82,17 @@ export function H1Review({ project, fp, extras, setExtras, onEdited }) {
   const previous = a.content.length > 1 ? a.content[a.content.length - 2] : null
   const rtl = isArabic(project)
   const [view, setView] = useState('text')
-  const [showSource, setShowSource] = useState(true)
+  // Side-by-side on wide screens; below 1600 px the draft comes first and the source opens on demand.
+  const [showSource, setShowSource] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 1600px)').matches)
   const [editing, setEditing] = useState(false)
   const [draftMd, setDraftMd] = useState(content.md)
   const [editNote, setEditNote] = useState('')
   const [highlight, setHighlight] = useState(true)
+  const [editError, setEditError] = useState('')
   const src = sourceExcerpt(project)
-  const done = useEditResult(onEdited)
+  const done = useEditResult(onEdited, setEditError)
+  const dirty = editing && (draftMd !== content.md || editNote.trim() !== '')
+  useUnsavedGuard(dirty)
 
   const save = () => {
     const r = act(editContent, { projectId: project.id, fp, md: draftMd, note: editNote })
@@ -108,7 +113,7 @@ export function H1Review({ project, fp, extras, setExtras, onEdited }) {
         </Alert>
       )}
 
-      <div className={cn('grid grid-cols-1 gap-6', showSource && !editing && 'xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]')}>
+      <div className={cn('grid grid-cols-1 gap-6', showSource && !editing && 'min-[1400px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]')}>
         {showSource && !editing && (
           <section aria-labelledby="src-h" className="min-w-0 rounded-xl border bg-surface">
             <div className="flex items-center justify-between gap-2 border-b px-5 py-3">
@@ -164,9 +169,10 @@ export function H1Review({ project, fp, extras, setExtras, onEdited }) {
                   <label htmlFor="edit-note" className="text-sm font-semibold">What did you change? <span className="font-normal text-muted-foreground">Optional — kept in the change log</span></label>
                   <Input id="edit-note" value={editNote} onChange={(e) => setEditNote(e.target.value)} placeholder="For example: corrected the warning signs wording" />
                 </div>
+                <InlineError>{editError}</InlineError>
                 <div className="flex flex-wrap gap-2">
                   <Button onClick={save}><Save data-icon="inline-start" /> Save new revision</Button>
-                  <Button variant="ghost" onClick={() => setEditing(false)}><X data-icon="inline-start" /> Cancel</Button>
+                  <Button variant="ghost" onClick={() => { if (confirmDiscard(dirty)) { setEditing(false); setEditError('') } }}><X data-icon="inline-start" /> Cancel</Button>
                 </div>
               </div>
             ) : view === 'text' ? (
@@ -295,7 +301,10 @@ export function H3Review({ project, fp, extras, setExtras, onEdited }) {
   const [editing, setEditing] = useState(false)
   const [scenes, setScenes] = useState(sb.scenes)
   const total = sb.scenes.reduce((s, x) => s + x.seconds, 0)
-  const done = useEditResult(onEdited)
+  const [editError, setEditError] = useState('')
+  const done = useEditResult(onEdited, setEditError)
+  const dirty = editing && JSON.stringify(scenes) !== JSON.stringify(sb.scenes)
+  useUnsavedGuard(dirty)
   const selected = extras.selected || []
   const toggle = (id, on) => setExtras((x) => ({ ...x, selected: on ? [...new Set([...(x.selected || []), id])] : (x.selected || []).filter((i) => i !== id) }))
 
@@ -318,10 +327,11 @@ export function H3Review({ project, fp, extras, setExtras, onEdited }) {
         ) : (
           <div className="flex gap-2">
             <Button onClick={save}><Save data-icon="inline-start" /> Save new version</Button>
-            <Button variant="ghost" onClick={() => setEditing(false)}><X data-icon="inline-start" /> Cancel</Button>
+            <Button variant="ghost" onClick={() => { if (confirmDiscard(dirty)) { setEditing(false); setEditError('') } }}><X data-icon="inline-start" /> Cancel</Button>
           </div>
         )}
       </div>
+      {editing && <InlineError>{editError}</InlineError>}
       {editing && <p className="text-sm text-muted-foreground">Edit on-screen text, visual descriptions or notes. Saving creates storyboard v{sb.version + 1}; draft frames are redrawn from your text.</p>}
       <ol className="flex flex-col gap-3">
         {(editing ? scenes : sb.scenes).map((s) => (
@@ -335,7 +345,7 @@ export function H3Review({ project, fp, extras, setExtras, onEdited }) {
                 {s.editedInVersion && <ToneBadge tone="processing" icon={PenLine}>Your edit</ToneBadge>}
                 {!editing && (
                   <label className="ml-auto flex items-center gap-2 text-sm">
-                    <Checkbox checked={selected.includes(s.id)} onCheckedChange={(v) => toggle(s.id, v)} aria-label={`Select scene ${s.id} for changes`} />
+                    <Checkbox checked={selected.includes(s.id)} onCheckedChange={(v) => toggle(s.id, v)} aria-label={`Needs changes, scene ${s.id}`} />
                     Needs changes
                   </label>
                 )}
@@ -388,7 +398,10 @@ export function H4Review({ project, fp, extras, setExtras, onEdited }) {
   const tr = currentTranscripts(project)
   const [editing, setEditing] = useState(null)
   const [text, setText] = useState('')
-  const done = useEditResult(onEdited)
+  const [editError, setEditError] = useState('')
+  const done = useEditResult(onEdited, setEditError)
+  const dirty = Boolean(editing) && text.trim() !== (tr[editing]?.text || '').trim()
+  useUnsavedGuard(dirty)
   const selected = extras.selected || []
   const toggle = (id, on) => setExtras((x) => ({ ...x, selected: on ? [...new Set([...(x.selected || []), id])] : (x.selected || []).filter((i) => i !== id) }))
   const guide = pronunciationGuide(project)
@@ -437,10 +450,10 @@ export function H4Review({ project, fp, extras, setExtras, onEdited }) {
                     {editing !== c.id && (
                       <>
                         <label className="flex items-center gap-2 text-sm">
-                          <Checkbox checked={selected.includes(c.id)} onCheckedChange={(v) => toggle(c.id, v)} aria-label={`Select chunk ${c.id} for revision`} />
+                          <Checkbox checked={selected.includes(c.id)} onCheckedChange={(v) => toggle(c.id, v)} aria-label={`Needs changes, chunk ${c.id}`} />
                           Needs changes
                         </label>
-                        <Button size="sm" variant="outline" onClick={() => { setEditing(c.id); setText(t.text) }} aria-label={`Edit chunk ${c.id}`}>
+                        <Button size="sm" variant="outline" onClick={() => { if (confirmDiscard(dirty)) { setEditing(c.id); setText(t.text); setEditError('') } }} aria-label={`Edit, chunk ${c.id}`}>
                           <PenLine data-icon="inline-start" /> Edit
                         </Button>
                       </>
@@ -453,9 +466,10 @@ export function H4Review({ project, fp, extras, setExtras, onEdited }) {
                       <label htmlFor={`tr-${c.id}`} className="sr-only">Transcript {c.id}</label>
                       <Textarea id={`tr-${c.id}`} rows={8} value={text} onChange={(e) => setText(e.target.value)} dir={rtl ? 'rtl' : undefined} className={cn(rtl && 'rtl-content')} />
                       <p className="text-sm text-muted-foreground">About {estimateSeconds(project, text)} s at the planned pace (target {c.targetSeconds} s). Saving creates v{t.version + 1}; only this chunk’s voice is regenerated later.</p>
+                      <InlineError>{editError}</InlineError>
                       <div className="flex gap-2">
                         <Button size="sm" onClick={() => save(c.id)}><Save data-icon="inline-start" /> Save new version</Button>
-                        <Button size="sm" variant="ghost" onClick={() => setEditing(null)}>Cancel</Button>
+                        <Button size="sm" variant="ghost" onClick={() => { if (confirmDiscard(dirty)) { setEditing(null); setEditError('') } }}>Cancel</Button>
                       </div>
                     </div>
                   ) : <SpeakerText text={t.text} rtl={rtl} />}
@@ -530,7 +544,7 @@ export function H5Review({ project, extras, setExtras }) {
                 </p>
               </div>
               <label className="flex items-center gap-2 text-sm md:justify-end">
-                <Checkbox checked={selected.includes(c.id)} onCheckedChange={(v) => toggle(c.id, v)} aria-label={`Select voice chunk ${c.id} for regeneration`} />
+                <Checkbox checked={selected.includes(c.id)} onCheckedChange={(v) => toggle(c.id, v)} aria-label={`Regenerate, chunk ${c.id}`} />
                 Regenerate
               </label>
             </li>
@@ -562,7 +576,7 @@ export function H6Review({ project, extras, setExtras }) {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <Panel title={`Final video — render v${render.version}`} description={`${seconds(render.durationSeconds)} simulated length · gap ${render.gapSeconds} s · fade ${render.fadeSeconds} s`}>
           <video controls preload="metadata" poster={`${base}samples/final-video-poster.jpg`} src={`${base}samples/final-video-sample.mp4`} className="aspect-video w-full rounded-lg bg-navy">
-            <track kind="captions" />
+            <track kind="captions" srcLang="en" label="English (sample)" src={`${base}samples/final-video-sample.vtt`} default />
           </video>
           <p className="mt-2 text-sm text-muted-foreground">
             Synthetic sample clip (about 20 s). In the real product this is the complete lecture video, and reviewing it takes its full length. <DemoTag>Sample</DemoTag>

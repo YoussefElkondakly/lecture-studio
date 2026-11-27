@@ -73,6 +73,15 @@ function RequestChangesDialog({ open, onOpenChange, project, gate, fp, extras, o
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
+  // Closing without sending keeps what was typed as a feedback draft — nothing is lost silently.
+  const close = (o) => {
+    if (!o && note.trim() && note !== (state.meta.feedbackDrafts?.[draftKey] || '')) {
+      act(saveFeedbackDraft, draftKey, note)
+      toast('Feedback draft kept', { description: 'It will be here when you reopen Request changes.' })
+    }
+    onOpenChange(o)
+  }
+
   const chunkGate = gate === 'H4' || gate === 'H5' || (gate === 'H6' && ['AUDIO', 'TRANSCRIPT'].includes(route))
   const sceneGate = gate === 'H3'
   const options = sceneGate ? last(project.artifacts.storyboard).scenes.map((s) => s.id) : project.plan.chunks.map((c) => c.id)
@@ -100,7 +109,7 @@ function RequestChangesDialog({ open, onOpenChange, project, gate, fp, extras, o
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={close}>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Request changes — {gate} {STATION_BY_ID[gate].name}</DialogTitle>
@@ -114,7 +123,7 @@ function RequestChangesDialog({ open, onOpenChange, project, gate, fp, extras, o
               <label key={r.id} className={cn('flex cursor-pointer items-start gap-3 rounded-md border px-3 py-2.5 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-teal', route === r.id ? 'border-navy bg-navy-tint' : 'hover:bg-subtle')}>
                 <input type="radio" name="h6-route" value={r.id} checked={route === r.id} onChange={() => { setRoute(r.id); setIds([]) }} className="mt-1 size-4 accent-[#153C63]" />
                 <span>
-                  <span className="text-sm font-semibold">{r.label} <span className="font-normal text-muted-foreground">({r.id})</span></span>
+                  <span className="text-sm font-semibold">{r.label}</span>
                   <span className="block text-sm text-muted-foreground">{r.help}</span>
                 </span>
               </label>
@@ -179,7 +188,7 @@ function RequestChangesDialog({ open, onOpenChange, project, gate, fp, extras, o
         </div>
 
         {error && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" role="alert">
             <AlertTriangle aria-hidden />
             <AlertTitle>Not sent</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
@@ -188,7 +197,7 @@ function RequestChangesDialog({ open, onOpenChange, project, gate, fp, extras, o
 
         <DialogFooter>
           <Button variant="ghost" onClick={saveDraft}><Save data-icon="inline-start" /> Save feedback draft</Button>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => close(false)}>Cancel</Button>
           <Button onClick={submit}><RotateCcw data-icon="inline-start" /> Send request</Button>
         </DialogFooter>
       </DialogContent>
@@ -380,12 +389,12 @@ export default function ReviewWorkspace() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1 text-sm">
         <p className="font-semibold">{versionLabel(project, gate)}</p>
-        <p className="text-muted-foreground">Fingerprint {openedFp?.split(':').slice(1).join(':').slice(0, 14)}</p>
+        <p className="text-xs text-muted-foreground">Version ID {openedFp?.split(':').slice(1).join(':').slice(0, 14)}</p>
         {promptRef && <p className="text-muted-foreground">Prompt: {promptRef.title} v{promptRef.version}</p>}
         <p className="flex items-center gap-1.5 text-muted-foreground"><Clock3 aria-hidden className="size-4" /> Waiting {elapsed(project.waitingSince, now)}</p>
       </div>
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" role="alert">
           <AlertTriangle aria-hidden />
           <AlertTitle>Not recorded</AlertTitle>
           <AlertDescription>{error}</AlertDescription>

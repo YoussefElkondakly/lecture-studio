@@ -22,7 +22,7 @@ export function Markdown({ md, previous, highlight = false, className, rtl }) {
     const line = lines[i]
     if (/^#{1,3} /.test(line)) {
       const level = line.match(/^#+/)[0].length
-      const H = `h${level + 1}`
+      const H = `h${level + 2}`
       blocks.push(<H key={i} dir={rtl ? 'auto' : undefined} className={cn(changed(line) && 'changed-line')}>{inline(line.replace(/^#+ /, ''))}</H>)
       i++
     } else if (/^> /.test(line)) {

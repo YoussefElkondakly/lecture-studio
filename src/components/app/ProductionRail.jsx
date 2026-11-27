@@ -39,7 +39,7 @@ function MachineMarker({ st }) {
   return (
     <span
       className={cn(
-        'relative z-10 flex size-7 items-center justify-center rounded-full border-2 text-[0.7rem] font-bold tabular',
+        'relative z-10 flex size-8 items-center justify-center rounded-full border-2 text-xs font-bold tabular',
         s === 'done' && 'border-navy bg-navy text-white',
         s === 'running' && 'border-processing bg-processing-bg text-processing',
         s === 'blocked' && 'border-blocked bg-blocked-bg text-blocked',
@@ -110,8 +110,10 @@ export function ProductionRail({ project, className }) {
 export function GatePips({ project, className }) {
   const states = stationStates(project).filter((s) => s.kind === 'gate')
   const done = states.filter((s) => s.state === 'done').length
+  const now = states.find((s) => s.state === 'review' || s.state === 'review-again')
+  const label = `${done} of ${GATES.length} approvals recorded${now ? `; waiting for ${now.id} ${now.name}` : ''}`
   return (
-    <span className={cn('inline-flex items-center gap-1', className)} role="img" aria-label={`${done} of ${GATES.length} approvals recorded`}>
+    <span className={cn('inline-flex items-center gap-1', className)} role="img" aria-label={label} title={label}>
       {states.map((s) => (
         <span
           key={s.id}
